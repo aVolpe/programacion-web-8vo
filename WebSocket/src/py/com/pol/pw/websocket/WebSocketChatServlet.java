@@ -22,6 +22,7 @@ public class WebSocketChatServlet extends WebSocketServlet {
 			HttpServletResponse response) throws ServletException, IOException {
 		getServletContext().getNamedDispatcher("default").forward(request,
 				response);
+		System.out.println("Get al websocketchatservlet");
 	}
 
 	public WebSocket doWebSocketConnect(HttpServletRequest request,
