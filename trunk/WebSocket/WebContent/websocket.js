@@ -4,11 +4,12 @@ WebSocket.prototype.join = function(name) {
 	this.usuario = name;
 	// var location = document.location.toString().replace('http://', 'ws://')
 	// .replace('https://', 'wss://');
-	var location = ("ws://localhost:8080/WebSocket/WebSocketChatServlet");
-	this.ws = new WebSocket(location, "org.ietf.websocket.test-echo-broadcast");
+	var location = ('ws://localhost:8080/WebSocket/WebSocketChatServlet');
+	this.ws = new WebSocket(location);
 	this.ws.onopen = this.opOpen;
 	this.ws.onmessage = this.onMessage;
 	this.ws.onclose = this.onClose;
+	alert("Conectado");
 };
 
 WebSocket.prototype.onOpen = function() {
