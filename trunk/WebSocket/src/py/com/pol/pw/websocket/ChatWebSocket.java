@@ -8,7 +8,6 @@ class ChatWebSocket implements WebSocket {
 
 	@Override
 	public void onClose(int arg0, String arg1) {
-
 	}
 
 	@Override

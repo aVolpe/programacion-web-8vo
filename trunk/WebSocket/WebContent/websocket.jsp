@@ -7,7 +7,7 @@
 	
 </script>
 <script type="text/javascript">
-	var ws = new WebSocket();
+	var ws = new WebSocketChat();
 	ws.join("PEPITO");
 </script>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
