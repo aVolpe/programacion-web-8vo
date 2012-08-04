@@ -8,11 +8,11 @@ var wsUri = "ws://localhost:8080/WebSocket/WebSocketChatServlet";
 var output;
 function init() {
 	output = document.getElementById("output");
-	testWebSocket();
+	testWebSocket(wsUri);
 };
 
-function testWebSocket() {
-	websocket = new WebSocket(wsUri);
+function testWebSocket(URL) {
+	websocket = new WebSocket(URL);
 	websocket.onopen = function(evt) {
 		onOpen(evt)
 	};
