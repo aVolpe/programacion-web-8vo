@@ -6,6 +6,10 @@ var iden;
 var nombre;
 var storeContactos;
 
+var TOKEN_SEPARADOR_VALUES = '!';
+var TOKEN_SEPARADOR = ':';
+var TOKEN_SEPARADOR_USERS = '&';
+
 Ext.onReady(function() {
 	Ext.QuickTips.init();
 
@@ -33,7 +37,6 @@ Ext.onReady(function() {
 		}
 	});
 
-	// setup the state provider, all state information will be saved to a cookie
 	Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
 	vp = Ext.create('Ext.panel.Panel', {
 		height : Ext.getBody().getViewSize().height,
@@ -93,7 +96,7 @@ Ext.onReady(function() {
 
 var login = function() {
 	var nombre = Ext.getCmp('user');
-	send("login:" + nombre.getValue() + "|000");
+	send("login:" + nombre.getValue() + "!000");
 };
 
 var recibirListaContactos = function(contactos) {
@@ -102,7 +105,7 @@ var recibirListaContactos = function(contactos) {
 		contacto = contactos[i];
 		var bandera = false;
 		console.log(contacto)
-		var partes = contacto.split('!');
+		var partes = contacto.split(TOKEN_SEPARADOR_VALUES);
 		console.log(partes);
 		storeContactos.each(function(record) {
 			if (record.get('identificador') == partes[1]) {
@@ -127,8 +130,8 @@ var recibirMensaje = function(mensaje) {
 	console.log(enString);
 	if (enString.charAt(0) == 'U') {
 		// lista de usuarios
-		var usuarios = enString.split(':')[1];
-		var lista = usuarios.split('&');
+		var usuarios = enString.split(TOKEN_SEPARADOR)[1];
+		var lista = usuarios.split(TOKEN_SEPARADOR_USERS);
 		console.log("LISTA = " + lista);
 		recibirListaContactos(lista)
 	}
@@ -136,7 +139,7 @@ var recibirMensaje = function(mensaje) {
 
 		var user = Ext.getCmp('user');
 		nombre = user.getValue();
-		iden = mensaje.data.split(':')[1];
+		iden = mensaje.data.split(TOKEN_SEPARADOR)[1];
 		if (iden != "0") {
 			win.close();
 			vp.enable();
