@@ -9,7 +9,7 @@ import org.eclipse.jetty.websocket.WebSocket;
 
 class ChatWebSocket implements WebSocket.OnTextMessage {
 
-	public static final char TOKEN_SEPARADOR_VALUES = '|';
+	public static final char TOKEN_SEPARADOR_VALUES = '!';
 	public static final char TOKEN_SEPARADOR_USERS = '&';
 	public static HashMap<Integer, Usuario> contactos;
 	public static int contadorUser = 3;
@@ -61,17 +61,17 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 		}
 		if (mensaje.startsWith("l")) {
 			System.out.println("Creando nuevo usuario");
-			String partes[] = ChatWebSocket.partir(mensaje.split(":")[1], '|');
+			String partes[] = ChatWebSocket.partir(mensaje.split(":")[1],
+					TOKEN_SEPARADOR_VALUES);
 			System.out.println(mensaje.split(":")[1]);
 			String nombre = partes[0];
 			System.out.println(nombre);
 			Usuario nuevo = new Usuario(nombre);
 			nuevo.color = partes[1];
-			nuevo.id = contadorUser++;
 			nuevo.conn = conn;
 			enviarMensaje(conn, "Logueado:" + nuevo.id);
 			contactos.put(nuevo.id, nuevo);
-			System.out.println("Nuevo usuario creado" + nuevo.toString());
+			System.out.println("Nuevo usuario creado: " + nuevo.toString());
 			// avisarATodos(nuevo);
 			return;
 		}
@@ -100,7 +100,8 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 	 * <b>Usuarios:nombre|id|color&nombre2|id2|color2</b> : lista de usuarios<br>
 	 * <b>NUsuario:nombre|id|color</b> : lista de usuarios<br>
 	 * <b>Mensajes:id|mensaje</b> : mensaje del id ID<br>
-	 * <b>Logueado:id</b> : id > 0 para exito, <0 para reintento
+	 * <b>Logueado:id</b> : id > 0 para exito, <0 para reintento <br>
+	 * <b>Cerrado:id</b>
 	 * 
 	 * @param mensaje
 	 */
@@ -123,39 +124,18 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 		}
 	}
 
-	static class Usuario {
-		Integer id;
-		String nombre;
-		String color;
-		Connection conn;
-
-		public Usuario(String nombre) {
-			this.nombre = nombre;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder sb = new StringBuilder(nombre);
-			sb.append(TOKEN_SEPARADOR_VALUES);
-			sb.append(id);
-			if (color != null) {
-				sb.append(TOKEN_SEPARADOR_VALUES);
-				sb.append(color);
-			}
-			return sb.toString();
-		}
-	}
-
 	public static String[] partir(String cadena, char letra) {
 		ArrayList<String> resultado = new ArrayList<String>();
-		String cadenaString = "";
 		int idInicio = 0;
 		for (int i = 0; i < cadena.length(); i++) {
 			if (cadena.charAt(i) == letra) {
 				resultado.add(cadena.substring(idInicio, i));
-				idInicio = i;
+				idInicio = i + 1;
 			}
 		}
-		return resultado.toArray(new String[1]);
+		if (idInicio != cadena.length()) {
+			resultado.add(cadena.substring(idInicio));
+		}
+		return resultado.toArray(new String[resultado.size()]);
 	}
 }
