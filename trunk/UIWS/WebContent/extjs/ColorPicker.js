@@ -2,6 +2,7 @@ Ext.define('Ext.ux.ColorPickerCombo', {
 	extend : 'Ext.form.field.Trigger',
 	alias : 'widget.colorcbo',
 	triggerTip : 'Seleccione un color.',
+	emptyText: 'Seleccione un color',
 	regex : /^[0-9a-fA-F]{6}$/,
 	regexText : 'Seleccione un color valido',
 	onTriggerClick : function() {

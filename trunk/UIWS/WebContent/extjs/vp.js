@@ -21,7 +21,6 @@ Ext.onReady(function() {
 		}, ]
 	});
 
-
 	contactos = Ext.create('Ext.grid.Panel', {
 		stateId : 'stateGrid',
 		store : storeContactos,
@@ -81,7 +80,27 @@ Ext.onReady(function() {
 			collapsible : true, // make collapsible
 			id : 'west-region-container',
 			layout : 'fit',
-			items : [ contactos ]
+			items : [ contactos ],
+			dockedItems : [ {
+				xtype : 'component',
+				flex : 1
+			}, {
+				xtype : 'toolbar',
+				dock : 'bottom',
+				items : [ {
+					xtype : 'button',
+					text : 'Logout',
+					handler : function() {
+						win.show();
+						vp.disable();
+						var nombre = Ext.getCmp('user');
+						var color = Ext.getCmp('color');
+						nombre.setValue("");
+						color.setValue("");
+						alert("CERRANDO SESION");
+					}
+				} ]
+			} ],
 		}, {
 			title : 'Conversaciones',
 			region : 'center', // center region is required, no width/height
@@ -177,11 +196,12 @@ var recibirListaContactos = function(contactos) {
 			}
 		}, this);
 		if (bandera == false) {
+			console.log("Agregando contacto: " + partes[0] + "!" + partes[1] + "!" + partes[2]);
 			storeContactos.add({
 				nombre : partes[0],
 				identificador : partes[1],
 				color : partes[2]
-				
+
 			});
 		}
 	}
@@ -199,9 +219,11 @@ var recibirMensaje = function(mensaje) {
 		console.log(usuario);
 		var nombre = usuario.split(TOKEN_SEPARADOR_VALUES)[0];
 		var iden = usuario.split(TOKEN_SEPARADOR_VALUES)[1];
+		var color = usuario.split(TOKEN_SEPARADOR_VALUES)[2];
 		storeContactos.add({
 			nombre : nombre,
-			identificador : iden
+			identificador : iden,
+			color : color
 		});
 
 	}
@@ -255,7 +277,7 @@ var recibirMensaje = function(mensaje) {
 	}
 };
 
-function renderizarContactos(contacto){
+function renderizarContactos(contacto) {
 	console.log(contacto);
 	var con = storeContactos.findRecord('identificador', contacto);
 	return '<span style="color:' + con.data.color + ';">' + con.data.nombre + '</span>';
