@@ -97,6 +97,7 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 		for (Entry<Integer, Usuario> entry : contactos.entrySet()) {
 			mensaje += entry.getValue().toString() + TOKEN_SEPARADOR_USERS;
 		}
+		System.out.println(mensaje);
 		enviarMensaje(conn, mensaje.substring(0, mensaje.length() - 1));
 	}
 
