@@ -12,7 +12,7 @@ var TOKEN_SEPARADOR_USERS = '&';
 
 Ext.onReady(function() {
 	Ext.QuickTips.init();
-	
+
 	storeContactos = Ext.create('Ext.data.ArrayStore', {
 		fields : [ {
 			name : 'nombre'
@@ -20,47 +20,50 @@ Ext.onReady(function() {
 			name : 'identificador'
 		}, ]
 	});
-	
+
+
 	contactos = Ext.create('Ext.grid.Panel', {
 		stateId : 'stateGrid',
 		store : storeContactos,
 		columns : [ {
 			text : 'Nombre',
 			flex : 1,
-			sortable : false,
-			dataIndex : 'nombre'
+			sortable : true,
+			dataIndex : 'identificador',
+			renderer : renderizarContactos,
 		} ],
+
 		height : 350,
 		width : 600,
 		viewConfig : {
 			stripeRows : true
 		},
-		listeners: {
-			cellclick: function(grid, td, cellIndex, record){
-//				var miStore = Ext.create('storeMensaje')
-//				var grilla = Ext.create('gridMensaje',{
-//					store: miStore
-//				});
-				
+		listeners : {
+			cellclick : function(grid, td, cellIndex, record) {
+				// var miStore = Ext.create('storeMensaje')
+				// var grilla = Ext.create('gridMensaje',{
+				// store: miStore
+				// });
+
 				setTab(record.data.identificador, record.data.nombre);
-				
-//				tabs.add({
-//					title : record.data.nombre,
-//					items: [ grilla ],
-//					closable : true
-//				}).show();
+
+				// tabs.add({
+				// title : record.data.nombre,
+				// items: [ grilla ],
+				// closable : true
+				// }).show();
 			}
 		}
 	});
-	
-// se manejara un tab por conversacion
+
+	// se manejara un tab por conversacion
 	tabs = Ext.create('Ext.tab.Panel', {
 		id : "tabs",
-	    items: [{
-	        title: 'Broadcast'
-	    }]
+		items : [ {
+			title : 'Todos'
+		} ]
 	});
-	
+
 	Ext.state.Manager.setProvider(Ext.create('Ext.state.CookieProvider'));
 	vp = Ext.create('Ext.panel.Panel', {
 		height : Ext.getBody().getViewSize().height,
@@ -86,50 +89,59 @@ Ext.onReady(function() {
 			xtype : 'panel',
 			layout : 'fit',
 			margins : '5 5 0 0',
-			items: [ tabs ],
+			items : [ tabs ],
 			dockedItems : [ {
 				xtype : 'toolbar',
 				items : [ {
-					
-		                xtype: 'textfield',
-		                id: 'mensaje'
-		                                
-				},{
+
+					xtype : 'textfield',
+					id : 'mensaje'
+
+				}, {
 					xtype : 'button',
 					text : 'Enviar',
-					handler:function() {
+					handler : function() {
 						var msg = Ext.getCmp('mensaje');
 						var tabActivo = tabs.getActiveTab();
 						var gridActivo = tabActivo.down('grid');
 						var storeActivo = gridActivo.getStore();
 						storeActivo.add({
-							mensaje : "Yo: " + msg.value,
+							nombre : "Yo",
+							mensaje : msg.value,
 						});
-//						no se me registra pues el store del nuevo
+						// no se me registra pues el store del nuevo
 						var record = storeContactos.findRecord('nombre', tabActivo.title);
 						send("mensaje:" + record.data.identificador + "!" + miID + "!" + msg.value);
 					}
-				}]
+				} ]
 			} ],
 		} ],
 		renderTo : Ext.getBody()
 	});
+	var colorPicker = Ext.create('Ext.ux.ColorPickerCombo');
+
 	win = Ext.create('widget.window', {
 		title : 'Ingrese su nombre',
 		closable : true,
 		closeAction : 'hide',
-		width : 600,
-		height : 200,
+		width : 300,
+		height : 150,
 		layout : 'border',
 		bodyStyle : 'padding: 5px;',
 		items : [ {
 			region : 'center',
-			xtype : 'textfield',
-			fieldLabel : 'Nombre de usuario',
-			emptyText : 'Ingrese su nombre',
-			name : 'first',
-			id : "user",
-			allowBlank : false
+			items : [ {
+				xtype : 'textfield',
+				fieldLabel : 'Nombre de usuario',
+				emptyText : 'Ingrese su nombre',
+				name : 'first',
+				id : "user",
+				allowBlank : false
+			}, {
+				id : 'color',
+				xtype : 'colorcbo',
+				fieldLabel : 'Color'
+			} ]
 		} ],
 		buttons : [ {
 			text : 'Login',
@@ -147,7 +159,8 @@ var miID = '';
 
 var login = function() {
 	var nombre = Ext.getCmp('user');
-	send("login:" + nombre.getValue() + "!000");
+	var color = Ext.getCmp('color');
+	send("login:" + nombre.getValue() + "!" + color.getValue());
 };
 
 var recibirListaContactos = function(contactos) {
@@ -166,58 +179,61 @@ var recibirListaContactos = function(contactos) {
 		if (bandera == false) {
 			storeContactos.add({
 				nombre : partes[0],
-				identificador : partes[1]
+				identificador : partes[1],
+				color : partes[2]
+				
 			});
 		}
 	}
 };
 
 var recibirChat = function(usuario, mensaje) {
-}
+};
 
 var recibirMensaje = function(mensaje) {
 	var enString = mensaje.data.toString();
 	console.log(enString);
-	
+
 	if (enString.charAt(0) == 'N') {
 		var usuario = enString.split(TOKEN_SEPARADOR)[1];
 		console.log(usuario);
 		var nombre = usuario.split(TOKEN_SEPARADOR_VALUES)[0];
 		var iden = usuario.split(TOKEN_SEPARADOR_VALUES)[1];
-			storeContactos.add({
-				nombre : nombre,
-				identificador : iden
-			});
-		
+		storeContactos.add({
+			nombre : nombre,
+			identificador : iden
+		});
 
 	}
-	
+
 	if (enString.charAt(0) == 'R') {
-//		var mensajeCompleto = enString.split(TOKEN_SEPARADOR)[1];
-//		console.log(mensajeCompleto);
+		// var mensajeCompleto = enString.split(TOKEN_SEPARADOR)[1];
+		// console.log(mensajeCompleto);
 		var id_envio = enString.split(TOKEN_SEPARADOR)[1];
 		var msg = enString.split(TOKEN_SEPARADOR)[2];
-//		console.log("me mandaron esto " + msg);
+		// console.log("me mandaron esto " + msg);
 		console.log(storeContactos);
 		var record = storeContactos.findRecord('identificador', id_envio);
-		setTab(id_envio,record.data.nombre);
-		
+		setTab(id_envio, record.data.nombre);
+
 		var tabActivo = tabs.getActiveTab();
 		var gridActivo = tabActivo.down('grid');
 		var storeActivo = gridActivo.getStore();
 		storeActivo.add({
-			mensaje: record.data.nombre + ": " + msg
+			nombre : record.data.nombre,
+			mensaje : msg
 		});
 	}
-	
-//	alert(enString);
+
+	// alert(enString);
 	if (enString.charAt(0) == 'U') {
 		// lista de usuarios
 		var usuarios = enString.split(TOKEN_SEPARADOR)[1];
 		var lista = usuarios.split(TOKEN_SEPARADOR_USERS);
 		console.log("LISTA = " + lista);
-		recibirListaContactos(lista)
+		recibirListaContactos(lista);
 	}
+	;
 	if (enString.charAt(0) == 'L') {
 
 		var user = Ext.getCmp('user');
@@ -226,10 +242,10 @@ var recibirMensaje = function(mensaje) {
 		if (iden != "0") {
 			win.close();
 			vp.enable();
-//			storeContactos.add({
-//				nombre : nombre,
-//				identificador : iden
-//			});
+			// storeContactos.add({
+			// nombre : nombre,
+			// identificador : iden
+			// });
 			miID = iden;
 			send("usuarios");
 		} else {
@@ -237,41 +253,53 @@ var recibirMensaje = function(mensaje) {
 		}
 
 	}
-}
+};
+
+function renderizarContactos(contacto){
+	console.log(contacto);
+	var con = storeContactos.findRecord('identificador', contacto);
+	return '<span style="color:' + con.data.color + ';">' + con.data.nombre + '</span>';
+};
 
 var setTab = function(identificador, titulo) {
 	var tab = Ext.getCmp(identificador);
-	
-	var miStore = Ext.create('storeMensaje')
-	var grilla = Ext.create('gridMensaje',{
-		store: miStore
-	});
-	
 	var pestanhas = Ext.getCmp('tabs');
+
 	if (tab == undefined) {
+		var miStore = Ext.create('storeMensaje');
+		var grilla = Ext.create('gridMensaje', {
+			store : miStore
+		});
+
 		pestanhas.add({
 			title : titulo,
-			id: identificador,
-			items: [ grilla ],
+			id : identificador,
+			items : [ grilla ],
 			closable : true,
-		})
+		});
 	}
 	var tab = Ext.getCmp(identificador);
 	pestanhas.setActiveTab(tab);
-}
+};
 
 Ext.define('storeMensaje', {
-	extend: 'Ext.data.Store',
+	extend : 'Ext.data.Store',
 	fields : [ {
+		name : 'nombre'
+	}, {
 		name : 'mensaje'
-	}]
-})
+	} ]
+});
 
 Ext.define('gridMensaje', {
-	extend: 'Ext.grid.Panel',
-	
-	store: '',
+	extend : 'Ext.grid.Panel',
+
+	store : '',
 	columns : [ {
+		dataIndex : 'nombre',
+		text : 'Usuario'
+	}, {
+		text : 'Mensaje',
 		dataIndex : 'mensaje',
 		flex : 1,
 	} ]
