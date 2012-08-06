@@ -35,7 +35,7 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 	public void onOpen(Connection conn) {
 		this.conn = conn;
 		if (contactos == null) {
-			contactos = new HashMap<>();
+			contactos = new HashMap<Integer, Usuario>();
 //			contactos.put(1, new Usuario("Mirta"));
 //			contactos.put(2, new Usuario("beatriz"));
 //			contactos.put(3, new Usuario("mirtita"));
@@ -71,6 +71,7 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 			System.out.println(nombre);
 			Usuario nuevo = new Usuario(nombre);
 			nuevo.color = partes[1];
+			//explotara
 			nuevo.conn = conn;
 			enviarMensaje(conn, "Logueado:" + nuevo.id);
 			contactos.put(nuevo.id, nuevo);
