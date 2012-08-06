@@ -12,7 +12,7 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 	public static final char TOKEN_SEPARADOR_VALUES = '!';
 	public static final char TOKEN_SEPARADOR_USERS = '&';
 	public static HashMap<Integer, Usuario> contactos;
-	public static int contadorUser = 3;
+	public static int contadorUser = 1;
 	public Connection conn;
 
 	@Override
@@ -36,9 +36,9 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 		this.conn = conn;
 		if (contactos == null) {
 			contactos = new HashMap<>();
-			contactos.put(1, new Usuario("Mirta"));
-			contactos.put(2, new Usuario("beatriz"));
-			contactos.put(3, new Usuario("mirtita"));
+//			contactos.put(1, new Usuario("Mirta"));
+//			contactos.put(2, new Usuario("beatriz"));
+//			contactos.put(3, new Usuario("mirtita"));
 		}
 		System.out.println("Chat web socket conectado");
 
@@ -61,6 +61,9 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 		}
 		if (mensaje.startsWith("l")) {
 			System.out.println("Creando nuevo usuario");
+			if (contactos == null) {
+				contactos = new HashMap<>();
+			}
 			String partes[] = ChatWebSocket.partir(mensaje.split(":")[1],
 					TOKEN_SEPARADOR_VALUES);
 			System.out.println(mensaje.split(":")[1]);
@@ -72,15 +75,16 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 			enviarMensaje(conn, "Logueado:" + nuevo.id);
 			contactos.put(nuevo.id, nuevo);
 			System.out.println("Nuevo usuario creado: " + nuevo.toString());
-			// avisarATodos(nuevo);
+			avisarATodos(nuevo);
 			return;
 		}
 		if (mensaje.startsWith("m")) {
 			System.out.println("Enviando mensaje");
-			String partes[] = mensaje.split(":")[1].split("|");
+			String partes[] = mensaje.split(":")[1].split("!");
 			Integer id = Integer.parseInt(partes[0]);
+			
 			if (contactos.get(id) != null) {
-				enviarMensaje(contactos.get(id).conn, partes[1]);
+				enviarMensaje(contactos.get(id).conn, "Recibio:"+partes[1] + ":" + partes[2]);
 			}
 		}
 	}
@@ -116,11 +120,15 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 	}
 
 	public void avisarATodos(Usuario nuevo) {
+		System.out.println("avisar a todos");
+		String mensaje = "NUsuario:" + nuevo.toString();
 		if (contactos == null)
 			return;
 		for (Entry<Integer, Usuario> entry : contactos.entrySet()) {
-			String mensaje = "NUsuario:" + entry.getValue().toString();
-			enviarMensaje(entry.getValue().conn, mensaje);
+//			String mensaje = "NUsuario:" + entry.getValue().toString();
+			if(entry.getValue()!=nuevo){
+				enviarMensaje(entry.getValue().conn, mensaje);
+			}
 		}
 	}
 
