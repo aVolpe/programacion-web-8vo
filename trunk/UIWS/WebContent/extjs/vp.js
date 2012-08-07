@@ -97,6 +97,7 @@ Ext.onReady(function() {
 						var color = Ext.getCmp('color');
 						nombre.setValue("");
 						color.setValue("");
+						send("out:" + miID);
 						alert("CERRANDO SESION");
 					}
 				} ]
@@ -187,9 +188,7 @@ var recibirListaContactos = function(contactos) {
 	for ( var i = 0; i < contactos.length; i++) {
 		contacto = contactos[i];
 		var bandera = false;
-		console.log(contacto);
 		var partes = contacto.split(TOKEN_SEPARADOR_VALUES);
-		console.log(partes);
 		storeContactos.each(function(record) {
 			if (record.get('identificador') == partes[1]) {
 				bandera = true;
@@ -213,10 +212,23 @@ var recibirChat = function(usuario, mensaje) {
 var recibirMensaje = function(mensaje) {
 	var enString = mensaje.data.toString();
 	console.log(enString);
-
+	if (enString.charAt(0) == 'O') {
+		var usuario = enString.split(TOKEN_SEPARADOR)[1].split(TOKEN_SEPARADOR_VALUES)[1];
+		var nombre = enString.split(TOKEN_SEPARADOR)[1].split(TOKEN_SEPARADOR_VALUES)[0];
+		var record = storeContactos.findRecord('identificador', usuario);
+		storeContactos.remove(record);
+		var tab = Ext.getCmp(usuario);
+		if (tab != undefined) {
+			var gridActivo = tab.down('grid');
+			var storeActivo = gridActivo.getStore();
+			storeActivo.add({
+				mensaje : nombre + " se ha desconectado."
+			});
+		}
+		return;
+	}
 	if (enString.charAt(0) == 'N') {
 		var usuario = enString.split(TOKEN_SEPARADOR)[1];
-		console.log(usuario);
 		var nombre = usuario.split(TOKEN_SEPARADOR_VALUES)[0];
 		var iden = usuario.split(TOKEN_SEPARADOR_VALUES)[1];
 		var color = usuario.split(TOKEN_SEPARADOR_VALUES)[2];
@@ -225,16 +237,13 @@ var recibirMensaje = function(mensaje) {
 			identificador : iden,
 			color : color
 		});
-
+		return;
 	}
 
 	if (enString.charAt(0) == 'R') {
 		// var mensajeCompleto = enString.split(TOKEN_SEPARADOR)[1];
-		// console.log(mensajeCompleto);
 		var id_envio = enString.split(TOKEN_SEPARADOR)[1];
 		var msg = enString.split(TOKEN_SEPARADOR)[2];
-		// console.log("me mandaron esto " + msg);
-		console.log(storeContactos);
 		var record = storeContactos.findRecord('identificador', id_envio);
 		setTab(id_envio, record.data.nombre);
 
@@ -252,7 +261,7 @@ var recibirMensaje = function(mensaje) {
 		// lista de usuarios
 		var usuarios = enString.split(TOKEN_SEPARADOR)[1];
 		var lista = usuarios.split(TOKEN_SEPARADOR_USERS);
-		console.log("LISTA = " + lista);
+		// console.log("LISTA = " + lista);
 		recibirListaContactos(lista);
 	}
 	;
@@ -278,7 +287,7 @@ var recibirMensaje = function(mensaje) {
 };
 
 function renderizarContactos(contacto) {
-	console.log(contacto);
+	// console.log(contacto);
 	var con = storeContactos.findRecord('identificador', contacto);
 	return '<span style="color:' + con.data.color + ';">' + con.data.nombre + '</span>';
 };
