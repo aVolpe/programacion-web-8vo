@@ -14,20 +14,12 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 	public static HashMap<Integer, Usuario> contactos;
 	public static int contadorUser = 1;
 	public Connection conn;
+	public Usuario user;
 
 	@Override
 	public void onClose(int arg0, String arg1) {
-		Usuario aborrar = null;
-
-		for (Entry<Integer, Usuario> entry : contactos.entrySet()) {
-			if (entry.getValue().conn == conn) {
-				aborrar = entry.getValue();
-				break;
-			}
-		}
-		if (aborrar != null) {
-			contactos.remove(aborrar.id);
-			System.out.println("Cliente " + aborrar.toString() + " eliminado.");
+		if (user != null){
+			contactos.remove(user.id);
 		}
 	}
 
@@ -36,9 +28,9 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 		this.conn = conn;
 		if (contactos == null) {
 			contactos = new HashMap<Integer, Usuario>();
-//			contactos.put(1, new Usuario("Mirta"));
-//			contactos.put(2, new Usuario("beatriz"));
-//			contactos.put(3, new Usuario("mirtita"));
+			// contactos.put(1, new Usuario("Mirta"));
+			// contactos.put(2, new Usuario("beatriz"));
+			// contactos.put(3, new Usuario("mirtita"));
 		}
 		System.out.println("Chat web socket conectado");
 
@@ -48,8 +40,8 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 	 * Posibles mensajes: <br>
 	 * <b>"usuarios"</b> : pide lista de usuarios <br>
 	 * <b>"login:nombre|color" </b>: registra un usuario <br>
-	 * <b>"mensaje:id|mensaje"</b> : envia un mensaje al id, si id = 0, envia a
-	 * todos
+	 * <b>"mensaje:id|mensaje"</b> : envia un mensaje al id, si id = 0, envia a<br>
+	 * <b>"out:id</b> todos
 	 */
 	@Override
 	public void onMessage(String mensaje) {
@@ -71,22 +63,29 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 			System.out.println(nombre);
 			Usuario nuevo = new Usuario(nombre);
 			nuevo.color = partes[1];
-			//explotara
+			this.user = nuevo;
+			// explotara
 			nuevo.conn = conn;
 			enviarMensaje(conn, "Logueado:" + nuevo.id);
 			contactos.put(nuevo.id, nuevo);
 			System.out.println("Nuevo usuario creado: " + nuevo.toString());
-			avisarATodos(nuevo);
+			avisarATodos(nuevo, false);
 			return;
 		}
 		if (mensaje.startsWith("m")) {
 			System.out.println("Enviando mensaje");
 			String partes[] = mensaje.split(":")[1].split("!");
 			Integer id = Integer.parseInt(partes[0]);
-			
+
 			if (contactos.get(id) != null) {
-				enviarMensaje(contactos.get(id).conn, "Recibio:"+partes[1] + ":" + partes[2]);
+				enviarMensaje(contactos.get(id).conn, "Recibio:" + partes[1]
+						+ ":" + partes[2]);
 			}
+		}
+		if (mensaje.startsWith("o")) {
+			System.out.println("Cerrando sesion user: " + user.toString());
+			contactos.remove(user);
+			avisarATodos(user, true);
 		}
 	}
 
@@ -121,14 +120,19 @@ class ChatWebSocket implements WebSocket.OnTextMessage {
 		}
 	}
 
-	public void avisarATodos(Usuario nuevo) {
+	public void avisarATodos(Usuario nuevo, Boolean salir) {
 		System.out.println("avisar a todos");
-		String mensaje = "NUsuario:" + nuevo.toString();
+
+		String mensaje;
+		if (!salir)
+			mensaje = "NUsuario:" + nuevo.toString();
+		else
+			mensaje = "OUsuario:" + nuevo.toString();
 		if (contactos == null)
 			return;
 		for (Entry<Integer, Usuario> entry : contactos.entrySet()) {
-//			String mensaje = "NUsuario:" + entry.getValue().toString();
-			if(entry.getValue()!=nuevo){
+			// String mensaje = "NUsuario:" + entry.getValue().toString();
+			if (entry.getValue() != nuevo) {
 				enviarMensaje(entry.getValue().conn, mensaje);
 			}
 		}
