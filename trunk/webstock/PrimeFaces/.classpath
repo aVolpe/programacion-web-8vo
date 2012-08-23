@@ -15,6 +15,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/WebStockJPA"/>
-	<classpathentry kind="lib" path="librerias/primefaces-3.4.RC1.jar" sourcepath="librerias/primefaces-3.4.RC1-sources.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
