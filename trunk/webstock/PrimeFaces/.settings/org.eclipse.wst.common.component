@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project-modules id="moduleCoreId" project-version="1.5.0">
-    <wb-module deploy-name="PrimeFaces">
+    <wb-module deploy-name="WebStockPF">
         <wb-resource deploy-path="/" source-path="/WebContent"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/librerias"/>
-        <property name="context-root" value="PrimeFaces"/>
-        <property name="java-output-path" value="/PrimeFaces/build/classes"/>
+        <property name="java-output-path" value="/WebStockPF/build/classes"/>
+        <property name="context-root" value="WebStockPF"/>
     </wb-module>
 </project-modules>
