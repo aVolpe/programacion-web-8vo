@@ -67,7 +67,7 @@ public class UserManagedBean {
 	public String login() {
 		if ("test".equalsIgnoreCase(getUsername())
 				&& "test".equals(getPassword())) {
-			return "home";
+			return "editablegrid";
 		} else {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage("username", new FacesMessage(
@@ -87,6 +87,7 @@ public class UserManagedBean {
 	public String updateUser() {
 		userService.update(this.selectedUser);
 		return "home";
+//		return "editablegrid";
 	}
 
 	public void onUserSelect(SelectEvent event) {

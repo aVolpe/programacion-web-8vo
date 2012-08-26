@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -50,9 +51,13 @@ public class UserService
         USERS_TABLE.remove(user.getUserId());
     }
 
-    public Collection<User> getAllUsers()
+    public List<User> getAllUsers()
     {
-        return USERS_TABLE.values();
+    	List<User> aret = new ArrayList<User>();
+    	for (User u : USERS_TABLE.values()){
+    		aret.add(u);
+    	}
+        return aret;
     }
 
     public User getUser(Integer userId)
