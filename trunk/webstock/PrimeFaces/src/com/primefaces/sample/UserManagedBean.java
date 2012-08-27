@@ -67,7 +67,7 @@ public class UserManagedBean {
 	public String login() {
 		if ("test".equalsIgnoreCase(getUsername())
 				&& "test".equals(getPassword())) {
-			return "editablegrid";
+			return "clienteABM";
 		} else {
 			FacesContext context = FacesContext.getCurrentInstance();
 			context.addMessage("username", new FacesMessage(

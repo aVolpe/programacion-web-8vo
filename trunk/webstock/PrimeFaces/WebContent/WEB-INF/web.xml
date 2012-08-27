@@ -21,5 +21,8 @@
 		<param-value>ui-lightness</param-value>
 	</context-param>
 
-
+	<context-param>
+		<param-name>org.jboss.jbossfaces.JSF_CONFIG_NAME</param-name>
+		<param-value>Mojarra-2.1.12</param-value>
+	</context-param>
 </web-app>

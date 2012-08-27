@@ -1,38 +1,71 @@
 <html xmlns="http://www.w3c.org/1999/xhtml"
-    xmlns:f="http://java.sun.com/jsf/core"
-    xmlns:h="http://java.sun.com/jsf/html"
-    xmlns:p="http://primefaces.org/ui">
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
 <h:head>
-        <link type="text/css" rel="stylesheet" href="theme.css" />
+	<link type="text/css" rel="stylesheet" href="theme.css" />
 </h:head>
 <h:body>
-<h:form id="form">
+	<h:form id="form">
 
-    <p:growl id="messages" showDetail="true"/>
+		<p:growl id="messages" showDetail="true" />
 
-    <p:dataTable var="user" value="#{tableBean.usersSmall}" id="userList" editable="true">
+		<p:dataTable var="car" value="#{tableBean.carsSmall}" id="carList"
+			editable="true">
 
-        <f:facet name="header">
+			<f:facet name="header">
             In-Cell Editing
         </f:facet>
 
-        <p:column headerText="Nombre" style="width:125px">
-            <p:cellEditor>
-                <f:facet name="output">
-                    <h:outputText value="#{user.username}" />
-                </f:facet>
-                <f:facet name="input">
-                    <p:inputText value="#{user.username}" style="width:100%"/>
-                </f:facet>
-            </p:cellEditor>
-        </p:column>
+			<p:ajax event="rowEdit" listener="#{tableBean.onEdit}"
+				update=":form:messages" />
+			<p:ajax event="rowEditCancel" listener="#{tableBean.onCancel}"
+				update=":form:messages" />
 
-        <p:column headerText="Options" style="width:50px">
-            <p:rowEditor />
-        </p:column>
+			<p:column headerText="Model" style="width:125px">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{car.model}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{car.model}" style="width:100%" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
 
-    </p:dataTable>
+			<p:column headerText="Year" style="width:125px">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{car.year}" />
+					</f:facet>
+					<f:facet name="input">
+						<p:inputText value="#{car.year}" style="width:100%" label="Year" />
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
 
-</h:form>
+			<p:column headerText="Manufacturer" style="width:125px">
+				<p:cellEditor>
+					<f:facet name="output">
+						<h:outputText value="#{car.manufacturer}" />
+					</f:facet>
+					<f:facet name="input">
+						<h:selectOneMenu value="#{car.manufacturer}">
+							<f:selectItems value="#{tableBean.manufacturers}" var="man"
+								itemLabel="#{man}" itemValue="#{man}" />
+						</h:selectOneMenu>
+					</f:facet>
+				</p:cellEditor>
+			</p:column>
+
+
+			<p:column headerText="Options" style="width:50px">
+				<p:rowEditor />
+			</p:column>
+
+		</p:dataTable>
+
+	</h:form>
+
 </h:body>
 </html>

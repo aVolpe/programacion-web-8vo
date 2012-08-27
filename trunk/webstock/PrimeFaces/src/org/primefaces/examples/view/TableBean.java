@@ -1,13 +1,21 @@
 package org.primefaces.examples.view;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import javax.faces.application.FacesMessage;
+import javax.faces.bean.ApplicationScoped;
+import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
+
+import org.primefaces.event.RowEditEvent;
 
 import com.primefaces.sample.User;
 import com.primefaces.sample.UserService;
 
+@ManagedBean
+@ApplicationScoped
 public class TableBean implements Serializable {
 
 	private static final long serialVersionUID = -7989542768982898289L;
@@ -15,6 +23,8 @@ public class TableBean implements Serializable {
 	private final static String[] colors;
 
 	private final static String[] manufacturers;
+
+	private String firstName;
 
 	private List<User> usuarios;
 
@@ -45,14 +55,10 @@ public class TableBean implements Serializable {
 	}
 
 	public TableBean() {
-		usuarios = new ArrayList<User>();
-		usuarios.add(new User());
-		usuarios.add(new User());
-		usuarios.add(new User());
-		usuarios.add(new User());
-//		UserService us = new UserService();
-//		usuarios = us.getAllUsers();
+		UserService us = new UserService();
+		usuarios = us.getAllUsers();
 
+		System.out.println("ME SHAMARON2");
 	}
 
 	public List<User> getCarsSmall() {
@@ -60,19 +66,19 @@ public class TableBean implements Serializable {
 		return usuarios;
 	}
 
-	private int getRandomYear() {
+	public int getRandomYear() {
 		return (int) (Math.random() * 50 + 1960);
 	}
 
-	private String getRandomColor() {
+	public String getRandomColor() {
 		return colors[(int) (Math.random() * 10)];
 	}
 
-	private String getRandomManufacturer() {
+	public String getRandomManufacturer() {
 		return manufacturers[(int) (Math.random() * 10)];
 	}
 
-	private String getRandomModel() {
+	public String getRandomModel() {
 		return UUID.randomUUID().toString().substring(0, 8);
 	}
 
@@ -82,5 +88,27 @@ public class TableBean implements Serializable {
 
 	public String[] getColors() {
 		return colors;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public void onEdit(RowEditEvent event) {
+		FacesMessage msg = new FacesMessage("Car Edited",
+				((User) event.getObject()).getUsername());
+
+		FacesContext.getCurrentInstance().addMessage(null, msg);
+	}
+
+	public void onCancel(RowEditEvent event) {
+		FacesMessage msg = new FacesMessage("Car Cancelled",
+				((User) event.getObject()).getUsername());
+
+		FacesContext.getCurrentInstance().addMessage(null, msg);
 	}
 }
