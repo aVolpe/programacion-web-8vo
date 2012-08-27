@@ -16,19 +16,19 @@ import javax.persistence.Transient;
 @ManagedBean
 @SessionScoped
 @Entity
-@Table(name="proveedores")
-public class Proveedor implements Serializable {
+@Table(name = "proveedores")
+public class Proveedor2 implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	
+
 	public int id;
 	public String nombres;
 	public String apellidos;
-	List<Proveedor> proveedores;
-	
+	List<Proveedor2> proveedores;
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="proveedor_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "proveedor_id")
 	public int getId() {
 		return id;
 	}
@@ -53,74 +53,73 @@ public class Proveedor implements Serializable {
 		this.apellidos = apellidos;
 	}
 
-	public Proveedor(){
-		
-	}
-	
-	public Proveedor(String nombres, String apellidos)
-    {
-        this.nombres = nombres;
-        this.apellidos = apellidos;
-    }
+	public Proveedor2() {
 
-	public String guardar(){
+	}
+
+	public Proveedor2(String nombres, String apellidos) {
+		this.nombres = nombres;
+		this.apellidos = apellidos;
+	}
+
+	public String guardar() {
 		System.out.println("Guardando proveedor");
-		
-		ProveedorDAO proveedorDAO = new ProveedorDAO(); 
-        Proveedor proveedor = new Proveedor(this.nombres, this.apellidos); 
-        proveedorDAO.guardarProveedor(proveedor);
-        
-		this.nombres="";
-		this.apellidos="";
-		
+
+		ProveedorDAO proveedorDAO = new ProveedorDAO();
+		Proveedor2 proveedor = new Proveedor2(this.nombres, this.apellidos);
+		proveedorDAO.guardarProveedor(proveedor);
+
+		this.nombres = "";
+		this.apellidos = "";
+
 		return "faces/nuevoProveedor";
 	}
-	
+
 	@Transient
-	public List<Proveedor> getProveedores() {
-		
+	public List<Proveedor2> getProveedores() {
+
 		ProveedorDAO proveedorDAO = new ProveedorDAO();
 		proveedores = proveedorDAO.obtenerListaProveedores();
-	 
+
 		return proveedores;
 	}
-	
-	public String buscar(){
-		ProveedorDAO proveedorDAO = new ProveedorDAO(); 
-        Proveedor proveedor = proveedorDAO.obtenerProveedor(this.id); 
-        
-		this.nombres=proveedor.getNombres();
-		this.apellidos=proveedor.getApellidos();
-		
+
+	public String buscar() {
+		ProveedorDAO proveedorDAO = new ProveedorDAO();
+		Proveedor2 proveedor = proveedorDAO.obtenerProveedor(this.id);
+
+		this.nombres = proveedor.getNombres();
+		this.apellidos = proveedor.getApellidos();
+
 		return "faces/modificarProveedor";
 	}
 
-	public String actualizar(){
+	public String actualizar() {
 		ProveedorDAO proveedorDAO = new ProveedorDAO();
-		
-		Proveedor proveedor = proveedorDAO.obtenerProveedor(this.id); 
-		
+
+		Proveedor2 proveedor = proveedorDAO.obtenerProveedor(this.id);
+
 		proveedor.nombres = this.nombres;
 		proveedor.apellidos = this.apellidos;
-		
+
 		proveedorDAO.actualizarProveedor(proveedor);
-		
-		this.nombres="";
-		this.apellidos="";
-		
+
+		this.nombres = "";
+		this.apellidos = "";
+
 		return "faces/modificarProveedor";
 	}
-	
-	public String eliminar(){
+
+	public String eliminar() {
 		ProveedorDAO proveedorDAO = new ProveedorDAO();
-		
-		Proveedor proveedor = proveedorDAO.obtenerProveedor(this.id); 
-		
-		proveedorDAO.eliminarProveedor(proveedor);		
+
+		Proveedor2 proveedor = proveedorDAO.obtenerProveedor(this.id);
+
+		proveedorDAO.eliminarProveedor(proveedor);
 		this.id = 0;
-		this.nombres="";
-		this.apellidos="";
-		
+		this.nombres = "";
+		this.apellidos = "";
+
 		return "faces/eliminarProveedor";
 	}
 }

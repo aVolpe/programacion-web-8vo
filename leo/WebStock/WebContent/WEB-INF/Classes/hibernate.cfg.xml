@@ -7,18 +7,22 @@
 		<property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 		<property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
 		<property name="hibernate.connection.url">jdbc:postgresql://localhost/webstock</property>
-		<property name="hibernate.connection.username">postgres</property>
-		<property name="hibernate.connection.password">postgres</property>
+		<property name="hibernate.connection.username">pg</property>
+		<property name="hibernate.connection.password">pg</property>
 
 		<property name="connection.pool_size">1</property>
 
 		<!-- Automatic schema creation (begin) === -->
 <!-- 		<property name="hibernate.hbm2ddl.auto">create</property> -->
 		<property name="show_sql">true</property> 
-		<property name="hbm2ddl.auto">create-drop</property>
+		<property name="hbm2ddl.auto">update</property>
 
-		<mapping class="py.una.pol.webstock.Cliente" />
-		<mapping class="py.una.pol.webstock.Proveedor" />
-		<mapping class="py.una.pol.webstock.Producto" />
+		<mapping class="py.una.pol.webstock.Cliente2" />
+		<mapping class="py.una.pol.webstock.Proveedor2" />
+		<mapping class="py.una.pol.webstock.Producto2" />
+		
+		<mapping class="py.una.pol.webstock.entities.Cliente" />
+		<mapping class="py.una.pol.webstock.entities.Proveedor" />
+		<mapping class="py.una.pol.webstock.entities.Producto" />
 	</session-factory>
 </hibernate-configuration>

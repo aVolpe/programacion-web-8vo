@@ -1,0 +1,184 @@
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+<h:head>
+	<link type="text/css" rel="stylesheet" href="theme.css" />
+</h:head>
+<h:body>
+	<p:growl id="growl" showDetail="true" life="30000" />
+
+
+	<h:form id="formList">
+		<p:dataTable var="proveedor"
+			value="#{proveedorController.proveedores}" id="proveedorsList"
+			editable="true" rowKey="#{proveedor.id}"
+			emptyMessage="No se encontraron proveedores"
+			filteredValue="#{proveedorController.filtrados}"
+			selection="#{proveedorController.seleccionado}"
+			selectionMode="single">
+
+			<f:facet name="header">
+			           Listado de proveedores
+			        </f:facet>
+
+			<p:ajax event="rowToggle" />
+
+			<p:column style="width:4%">
+				<p:rowToggler />
+			</p:column>
+
+			<p:column headerText="Nombre" style="width:200px"
+				filterStyle="width: 200px;" sortBy="#{proveedor.nombre}"
+				filterBy="#{proveedor.nombre}" filterMatchMode="contains">
+				<h:outputText value="#{proveedor.nombre}" />
+			</p:column>
+
+			<p:column headerText="RUC" style="width:200px"
+				filterStyle="width: 200px;" sortBy="#{proveedor.ruc}"
+				filterBy="#{proveedor.ruc}" filterMatchMode="contains">
+				<h:outputText value="#{proveedor.ruc}" />
+			</p:column>
+
+			<p:column headerText="Telefono" style="width:200px"
+				filterStyle="width: 200px;" sortBy="#{proveedor.telefono}"
+				filterBy="#{proveedor.telefono}" filterMatchMode="contains">
+				<h:outputText value="#{proveedor.telefono}" />
+			</p:column>
+
+			<p:column headerText="Fecha de alta" style="width:280px"
+				sortBy="#{proveedor.fechaAlta}">
+				<h:outputText value="#{proveedor.fechaAlta}">
+					<f:convertDateTime
+						pattern="EEEE dd 'de' MMMM 'del' yyyy 'a las' hh:mm a" />
+				</h:outputText>
+			</p:column>
+			<f:facet name="footer">
+				<p:commandButton value="Agregar" update=":dialog"
+					actionListener="#{proveedorController.empezarNuevo}"
+					oncomplete="dlg.show()" />
+				<p:commandButton value="Editar" update=":dialog"
+					actionListener="#{proveedorController.editar}"
+					oncomplete="permitirEditar(xhr, status, args)" />
+				<p:commandButton value="Borrar" update="proveedorsList, :growl"
+					actionListener="#{proveedorController.borrar}" />
+			</f:facet>
+
+			<!--  PARTE EXPANSIBLE -->
+			<p:rowExpansion>
+				<p:dataTable var="producto" value="#{proveedor.productos}"
+					id="productoslist" rowKey="#{producto.id}"
+					emptyMessage="No se encontraron productos"
+					selection="#{proveedorController.productoSeleccionado}"
+					selectionMode="single">
+
+					<p:column headerText="Nombre">
+						<h:outputText value="#{producto.nombre}" />
+					</p:column>
+
+					<p:column headerText="Cantidad">
+						<h:outputText value="#{producto.cantidad}" />
+					</p:column>
+
+					<f:facet name="footer">
+						<p:commandButton value="Agregar" update=":dialog"
+							oncomplete="dlg_nuevo_producto.show()" />
+						<p:commandButton value="Borrar" update="proveedorsList, :growl"
+							actionListener="#{proveedorController.borrar}" />
+					</f:facet>
+				</p:dataTable>
+			</p:rowExpansion>
+		</p:dataTable>
+	</h:form>
+
+	<p:dialog id="dialog" header="Proveedores" widgetVar="dlg">
+		<h:form id="form">
+			<p:messages id="msgs" />
+			<h:panelGrid columns="3">
+				<h:outputLabel for="firstname" value="Nombre: " />
+				<p:inputText id="firstname" label="Nombre de proveedor"
+					value="#{proveedorController.proveedor.nombre}" required="true">
+					<f:validateLength minimum="5" />
+				</p:inputText>
+				<p:message for="firstname" display="icon" />
+
+				<h:outputLabel for="surname" value="R.U.C.: " />
+				<p:inputText id="surname"
+					value="#{proveedorController.proveedor.ruc}" label="R.U.C."
+					required="true">
+					<f:validateLength minimum="5" />
+				</p:inputText>
+				<p:message for="surname" id="msgSurname" display="icon" />
+
+				<h:outputLabel for="telefono" value="Telefono: " />
+				<p:inputMask id="telefono"
+					value="#{proveedorController.proveedor.telefono}" label="Telefono"
+					required="true" mask="(9999) 999-999">
+					<f:validateLength minimum="6" />
+				</p:inputMask>
+				<p:message for="telefono" id="msgTelefono" display="icon" />
+
+				<h:outputLabel for="fechaAlta" value="Fecha de alta: " />
+				<p:calendar id="fechaAlta"
+					value="#{proveedorController.proveedor.fechaAlta}"
+					label="Fecha de alta" />
+				<p:message for="fechaAlta" id="msgFechaAlta" display="icon" />
+				<f:facet name="footer">
+					<p:commandButton value="Guardar"
+						update=":growl, :formList:proveedorsList"
+						actionListener="#{proveedorController.aceptar}"
+						oncomplete="handleLoginRequest(xhr, status, args)" />
+					<p:commandButton value="Cancelar" onclick="dlg.hide()" />
+				</f:facet>
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+
+	<p:dialog id="dialog2" header="Agregar producto"
+		widgetVar="dlg_nuevo_producto">
+		<h:form id="form3">
+			<p:messages id="msgs" />
+			<h:panelGrid columns="2">
+				<h:outputLabel for="productos" value="Seleccione un producto: " />
+				<p:selectOneMenu id="productos" var="produc"
+					value="#{proveedorController.nuevoProducto}" effect="fold">
+					<f:selectItems value="#{proveedorController.productos}" />
+					<p:column>
+						<h:outputText value="#{produc.nombre}" />
+					</p:column>
+
+				</p:selectOneMenu>
+				<f:facet name="footer">
+					<p:commandButton value="Guardar" inmediate="true"
+						update=":growl, :formList:proveedorsList"
+						actionListener="#{proveedorController.aceptarButtonNewProduct}"
+						oncomplete="dlg_nuevo_producto.hide()" />
+					<p:commandButton value="Cancelar"
+						onclick="dlg_nuevo_producto.hide()" />
+				</f:facet>
+			</h:panelGrid>
+
+		</h:form>
+	</p:dialog>
+
+</h:body>
+
+
+<script type="text/javascript">  
+    function handleLoginRequest(xhr, status, args) {  
+    	if(args.validationFailed) {  
+            jQuery('#dialog').effect("shake", { times:3 }, 100);  
+        } else {  
+            dlg.hide();  
+        }  
+    }  
+	function permitirEditar(xhr, status, args) {
+        if (args.puedeEditarProveedorABM){
+            dlg.show();
+        } else {
+            alert("Por favor, seleccione un proveedor");
+        }
+    }
+</script>
+</html>

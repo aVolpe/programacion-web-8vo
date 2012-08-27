@@ -16,14 +16,14 @@ import java.util.List;
 @SessionScoped
 @Entity
 @Table(name="clientes")
-public class Cliente implements Serializable {
+public class Cliente2 implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
 	int id;
 	String nombres;
 	String apellidos;
-	List<Cliente> clientes;
+	List<Cliente2> clientes;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -51,11 +51,11 @@ public class Cliente implements Serializable {
 		this.apellidos = apellidos;
 	}
 
-	public Cliente(){
+	public Cliente2(){
 		
 	}
 	
-	public Cliente(String nombres, String apellidos){
+	public Cliente2(String nombres, String apellidos){
 		this.nombres = nombres;
 		this.apellidos = apellidos;
 	}
@@ -64,7 +64,7 @@ public class Cliente implements Serializable {
 		System.out.println("Guardando cliente");
 		
 		ClienteDAO clienteDAO = new ClienteDAO(); 
-        Cliente cliente = new Cliente(this.nombres, this.apellidos); 
+        Cliente2 cliente = new Cliente2(this.nombres, this.apellidos); 
         clienteDAO.guardarCliente(cliente);
         
 		this.nombres="";
@@ -74,7 +74,7 @@ public class Cliente implements Serializable {
 	}
 	
 	@Transient
-	public List<Cliente> getClientes() {
+	public List<Cliente2> getClientes() {
 		
 		ClienteDAO clienteDAO = new ClienteDAO();
 		clientes = clienteDAO.obtenerListaClientes();
@@ -84,7 +84,7 @@ public class Cliente implements Serializable {
 	
 	public String buscar(){
 		ClienteDAO clienteDAO = new ClienteDAO(); 
-        Cliente cliente = clienteDAO.obtenerCliente(this.id); 
+        Cliente2 cliente = clienteDAO.obtenerCliente(this.id); 
         
 		this.nombres=cliente.getNombres();
 		this.apellidos=cliente.getApellidos();
@@ -95,7 +95,7 @@ public class Cliente implements Serializable {
 	public String actualizar(){
 		ClienteDAO clienteDAO = new ClienteDAO();
 		
-		Cliente cliente = clienteDAO.obtenerCliente(this.id); 
+		Cliente2 cliente = clienteDAO.obtenerCliente(this.id); 
 		
 		cliente.nombres = this.nombres;
 		cliente.apellidos = this.apellidos;
@@ -111,7 +111,7 @@ public class Cliente implements Serializable {
 	public String eliminar(){
 		ClienteDAO clienteDAO = new ClienteDAO();
 		
-		Cliente cliente = clienteDAO.obtenerCliente(this.id); 
+		Cliente2 cliente = clienteDAO.obtenerCliente(this.id); 
 		
 		clienteDAO.eliminarCliente(cliente);		
 		this.id = 0;

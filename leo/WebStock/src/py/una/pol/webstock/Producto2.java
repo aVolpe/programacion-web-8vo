@@ -17,7 +17,7 @@ import java.util.List;
 @SessionScoped
 @Entity
 @Table(name="productos")
-public class Producto implements Serializable {
+public class Producto2 implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -25,7 +25,7 @@ public class Producto implements Serializable {
 	String descripcion;
 	int cantidad;
 	
-	List<Producto> productos;
+	List<Producto2> productos;
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -55,11 +55,11 @@ public class Producto implements Serializable {
 	}
 
 	
-	public Producto(){
+	public Producto2(){
 		
 	}
 	
-	public Producto(String descripcion){
+	public Producto2(String descripcion){
 		this.descripcion= descripcion;
 	}
 	
@@ -67,7 +67,7 @@ public class Producto implements Serializable {
 		System.out.println("Guardando producto");
 		
 		ProductoDAO productoDAO = new ProductoDAO(); 
-        Producto producto = new Producto(this.descripcion); 
+        Producto2 producto = new Producto2(this.descripcion); 
         productoDAO.guardarProducto(producto);
         
 		this.descripcion="";
@@ -76,7 +76,7 @@ public class Producto implements Serializable {
 	}
 	
 	@Transient
-	public List<Producto> getProductos() {
+	public List<Producto2> getProductos() {
 		
 		ProductoDAO productoDAO = new ProductoDAO();
 		productos = productoDAO.obtenerListaProductos();
@@ -86,7 +86,7 @@ public class Producto implements Serializable {
 	
 	public String buscar(){
 		ProductoDAO productoDAO = new ProductoDAO(); 
-        Producto producto = productoDAO.obtenerProducto(this.id); 
+        Producto2 producto = productoDAO.obtenerProducto(this.id); 
         
 		this.descripcion=producto.getDescripcion();
 		
@@ -96,7 +96,7 @@ public class Producto implements Serializable {
 	public String actualizar(){
 		ProductoDAO productoDAO = new ProductoDAO();
 		
-		Producto producto = productoDAO.obtenerProducto(this.id); 
+		Producto2 producto = productoDAO.obtenerProducto(this.id); 
 		
 		producto.descripcion = this.descripcion;
 		
@@ -110,7 +110,7 @@ public class Producto implements Serializable {
 	public String eliminar(){
 		ProductoDAO productoDAO = new ProductoDAO();
 		
-		Producto producto = productoDAO.obtenerProducto(this.id); 
+		Producto2 producto = productoDAO.obtenerProducto(this.id); 
 		
 		productoDAO.eliminarProducto(producto);		
 		this.id = 0;

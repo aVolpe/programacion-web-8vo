@@ -22,7 +22,7 @@ public class ProveedorDAO {
 	    throw new HibernateException("Ocurrió un error en la capa de acceso a datos", he);
 	}
 	
-	public long guardarProveedor(Proveedor proveedor)
+	public long guardarProveedor(Proveedor2 proveedor)
 	{ 
 	    long id = 0;  
 
@@ -42,7 +42,7 @@ public class ProveedorDAO {
 	    return id; 
 	}
 	
-	public void actualizarProveedor(Proveedor proveedor) throws HibernateException 
+	public void actualizarProveedor(Proveedor2 proveedor) throws HibernateException 
 	{ 
 	    try 
 	    { 
@@ -59,7 +59,7 @@ public class ProveedorDAO {
 	    } 
 	}
 	
-	public void eliminarProveedor(Proveedor proveedor) throws HibernateException 
+	public void eliminarProveedor(Proveedor2 proveedor) throws HibernateException 
 	{ 
 	    try 
 	    { 
@@ -77,21 +77,21 @@ public class ProveedorDAO {
 	}
 	
 
-	public Proveedor obtenerProveedor(int idProveedor) throws HibernateException {
-		Proveedor proveedor = null;
+	public Proveedor2 obtenerProveedor(int idProveedor) throws HibernateException {
+		Proveedor2 proveedor = null;
 
 		try {
 			iniciaOperacion();
-			proveedor = (Proveedor) sesion.get(Proveedor.class, idProveedor);
+			proveedor = (Proveedor2) sesion.get(Proveedor2.class, idProveedor);
 		} finally {
 			sesion.close();
 		}
 		return proveedor;
 	}
 	
-	public List<Proveedor> obtenerListaProveedores() throws HibernateException 
+	public List<Proveedor2> obtenerListaProveedores() throws HibernateException 
 	{ 
-	    List<Proveedor> listaProveedores = null;  
+	    List<Proveedor2> listaProveedores = null;  
 	    
 	    try 
 	    { 
