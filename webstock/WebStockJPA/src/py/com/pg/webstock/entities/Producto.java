@@ -13,9 +13,12 @@ import javax.persistence.ManyToOne;
 public class Producto extends BaseEntity implements Serializable {
 
 	private String nombre;
-	private int cantidad;
+	private Long cantidad;
 	@ManyToOne
 	private Proveedor proveedor;
+
+	private Double precioCompra;
+	private Double precioVenta;
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,11 +34,11 @@ public class Producto extends BaseEntity implements Serializable {
 		this.nombre = nombre;
 	}
 
-	public int getCantidad() {
+	public Long getCantidad() {
 		return cantidad;
 	}
 
-	public void setCantidad(int cantidad) {
+	public void setCantidad(Long cantidad) {
 		this.cantidad = cantidad;
 	}
 
@@ -45,6 +48,22 @@ public class Producto extends BaseEntity implements Serializable {
 
 	public void setProveedor(Proveedor proveedor) {
 		this.proveedor = proveedor;
+	}
+
+	public Double getPrecioCompra() {
+		return precioCompra;
+	}
+
+	public void setPrecioCompra(Double precioCompra) {
+		this.precioCompra = precioCompra;
+	}
+
+	public Double getPrecioVenta() {
+		return precioVenta;
+	}
+
+	public void setPrecioVenta(Double precioVenta) {
+		this.precioVenta = precioVenta;
 	}
 
 }

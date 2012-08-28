@@ -18,6 +18,7 @@ public class Cliente extends BaseEntity implements Serializable {
 	private String ruc;
 	private Date fechaAlta;
 	private String telefono;
+	private Double saldo;
 
 	public Cliente() {
 		super();
@@ -53,6 +54,14 @@ public class Cliente extends BaseEntity implements Serializable {
 
 	public void setTelefono(String telefono) {
 		this.telefono = telefono;
+	}
+
+	public Double getSaldo() {
+		return saldo;
+	}
+
+	public void setSaldo(Double saldo) {
+		this.saldo = saldo;
 	}
 
 }
