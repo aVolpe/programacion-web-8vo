@@ -3,99 +3,101 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:p="http://primefaces.org/ui" template="templates/template.xhtml">
-	<ui:define name="head">Clientes - WebStock</ui:define>
+	<ui:define name="head">Proveedores - WebStock</ui:define>
 	<ui:define name="content">
 		<div class="entry" style="line-height: 200%">
 			<p:growl id="growl" showDetail="true" life="3000" />
 
 
-
 			<h:form id="formList">
-				<p:dataTable var="cliente" value="#{clienteController.clientes}"
-					id="clientesList" editable="true" rowKey="#{cliente.id}"
-					emptyMessage="No se encontraron clientes"
-					filteredValue="#{clienteController.filtrados}"
-					selection="#{clienteController.seleccionado}"
+				<p:dataTable var="proveedor"
+					value="#{proveedorController.proveedores}" id="proveedorsList"
+					editable="true" rowKey="#{proveedor.id}"
+					emptyMessage="No se encontraron proveedores"
+					filteredValue="#{proveedorController.filtrados}"
+					selection="#{proveedorController.seleccionado}"
 					selectionMode="single">
 
 					<f:facet name="header">
-			           Listado de clientes
+			           Listado de proveedores
 			        </f:facet>
 
 					<p:column headerText="Nombre" style="width:200px"
-						filterStyle="width: 200px;" sortBy="#{cliente.nombre}"
-						filterBy="#{cliente.nombre}" filterMatchMode="contains">
-						<h:outputText value="#{cliente.nombre}" />
+						filterStyle="width: 200px;" sortBy="#{proveedor.nombre}"
+						filterBy="#{proveedor.nombre}" filterMatchMode="contains">
+						<h:outputText value="#{proveedor.nombre}" />
 					</p:column>
 
 					<p:column headerText="RUC" style="width:200px"
-						filterStyle="width: 200px;" sortBy="#{cliente.ruc}"
-						filterBy="#{cliente.ruc}" filterMatchMode="contains">
-						<h:outputText value="#{cliente.ruc}" />
+						filterStyle="width: 200px;" sortBy="#{proveedor.ruc}"
+						filterBy="#{proveedor.ruc}" filterMatchMode="contains">
+						<h:outputText value="#{proveedor.ruc}" />
 					</p:column>
 
 					<p:column headerText="Telefono" style="width:200px"
-						filterStyle="width: 200px;" sortBy="#{cliente.telefono}"
-						filterBy="#{cliente.telefono}" filterMatchMode="contains">
-						<h:outputText value="#{cliente.telefono}" />
+						filterStyle="width: 200px;" sortBy="#{proveedor.telefono}"
+						filterBy="#{proveedor.telefono}" filterMatchMode="contains">
+						<h:outputText value="#{proveedor.telefono}" />
 					</p:column>
 
 					<p:column headerText="Fecha de alta" style="width:280px"
-						sortBy="#{cliente.fechaAlta}">
-						<h:outputText value="#{cliente.fechaAlta}">
+						sortBy="#{proveedor.fechaAlta}">
+						<h:outputText value="#{proveedor.fechaAlta}">
 							<f:convertDateTime
 								pattern="EEEE dd 'de' MMMM 'del' yyyy 'a las' hh:mm a" />
 						</h:outputText>
 					</p:column>
 					<f:facet name="footer">
 						<p:commandButton value="Agregar" update=":dialog"
-							actionListener="#{clienteController.empezarNuevo}"
+							actionListener="#{proveedorController.empezarNuevo}"
 							oncomplete="dlg.show()" />
 						<p:commandButton value="Editar" update=":dialog"
-							actionListener="#{clienteController.editar}"
+							actionListener="#{proveedorController.editar}"
 							oncomplete="permitirEditar(xhr, status, args)" />
-						<p:commandButton value="Borrar" update="clientesList, :growl"
-							actionListener="#{clienteController.borrar}" />
+						<p:commandButton value="Borrar" update="proveedorsList, :growl"
+							actionListener="#{proveedorController.borrar}" />
+
 					</f:facet>
+
 				</p:dataTable>
 			</h:form>
 
-
-			<p:dialog id="dialog" header="Cliente" widgetVar="dlg">
+			<p:dialog id="dialog" header="Proveedores" widgetVar="dlg">
 				<h:form id="form">
 					<p:messages id="msgs" />
 					<h:panelGrid columns="3">
 						<h:outputLabel for="firstname" value="Nombre: " />
-						<p:inputText id="firstname" label="Nombre de cliente"
-							value="#{clienteController.cliente.nombre}" required="true">
+						<p:inputText id="firstname" label="Nombre de proveedor"
+							value="#{proveedorController.proveedor.nombre}" required="true">
 							<f:validateLength minimum="5" />
 						</p:inputText>
 						<p:message for="firstname" display="icon" />
 
 						<h:outputLabel for="surname" value="R.U.C.: " />
-						<p:inputText id="surname" value="#{clienteController.cliente.ruc}"
-							label="R.U.C." required="true">
+						<p:inputText id="surname"
+							value="#{proveedorController.proveedor.ruc}" label="R.U.C."
+							required="true">
 							<f:validateLength minimum="5" />
 						</p:inputText>
 						<p:message for="surname" id="msgSurname" display="icon" />
 
 						<h:outputLabel for="telefono" value="Telefono: " />
 						<p:inputMask id="telefono"
-							value="#{clienteController.cliente.telefono}" label="Telefono"
-							required="true" mask="(9999) 999-999">
+							value="#{proveedorController.proveedor.telefono}"
+							label="Telefono" required="true" mask="(9999) 999-999">
 							<f:validateLength minimum="6" />
 						</p:inputMask>
 						<p:message for="telefono" id="msgTelefono" display="icon" />
 
 						<h:outputLabel for="fechaAlta" value="Fecha de alta: " />
 						<p:calendar id="fechaAlta"
-							value="#{clienteController.cliente.fechaAlta}"
+							value="#{proveedorController.proveedor.fechaAlta}"
 							label="Fecha de alta" />
 						<p:message for="fechaAlta" id="msgFechaAlta" display="icon" />
 						<f:facet name="footer">
 							<p:commandButton value="Guardar"
-								update=":growl, :formList:clientesList"
-								actionListener="#{clienteController.aceptar}"
+								update=":growl, :formList:proveedorsList"
+								actionListener="#{proveedorController.aceptar}"
 								oncomplete="handleLoginRequest(xhr, status, args)" />
 							<p:commandButton value="Cancelar" onclick="dlg.hide()" />
 						</f:facet>
@@ -107,6 +109,8 @@
 
 
 		</div>
+
+
 		<script type="text/javascript">  
 		    function handleLoginRequest(xhr, status, args) {  
 		    	if(args.validationFailed) {  
@@ -116,14 +120,12 @@
 		        }  
 		    }  
 			function permitirEditar(xhr, status, args) {
-		        if (args.puedeEditarClienteABM){
+		        if (args.puedeEditarProveedorABM){
 		            dlg.show();
 		        } else {
-		            alert("Por favor, seleccione un cliente");
-		            }
+		            alert("Por favor, seleccione un proveedor");
+		        }
 		    }
 		</script>
 	</ui:define>
 </ui:composition>
-
-

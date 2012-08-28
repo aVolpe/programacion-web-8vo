@@ -1,0 +1,77 @@
+<html xmlns="http://www.w3c.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<f:view contentType="text/html">
+
+	<h:head>
+		<title><ui:insert name="head"></ui:insert></title>
+		<meta content='text/html; charset=UTF-8' http-equiv="Content-Type" />
+		<style type="text/css">
+body {
+	background-image: url(images/background.jpg);
+}
+
+.ui-widget {
+	font-size: 98% !important;
+}
+
+.ui-menu .ui-menu-item .ui-menu-item-label {
+	padding: .2em 1.7em;
+	align: center;
+}
+
+.ui-growl {
+	top: 115px;
+}
+
+.themeMenu {
+	overflow: auto;
+	height: 300px;
+	width: 200px;
+}
+</style>
+	</h:head>
+
+	<h:body style="">
+		<p:dock>
+			<p:menuitem value="Cliente" icon="/images/resellers.png"
+				url="clienteABM.jsf" style="color:#FC8039" />
+			<p:menuitem value="Proveedores" icon="/images/portfolio.png"
+				url="proveedorABM.jsf" style="color:#FC8039" />
+			<p:menuitem value="Producto" icon="/images/register.png"
+				url="productoABM.jsf" style="color:#FC8039" />
+			<p:menuitem value="Compras" icon="/images/iconoCompras.png"
+				url="compraABM.jsf" style="color:#FC8039" />
+		</p:dock>
+		<div class="ui-widget ui-widget-header">
+			<div id="logo">
+				<h1 align="center">Bienvenido a WebStock</h1>
+			</div>
+		</div>
+
+
+		<div id="wrapper">
+
+			<div id="page">
+				<div id="content" class="ui-widget">
+					<div class="post">
+						<ui:insert name="content">...</ui:insert>
+					</div>
+				</div>
+
+				<div style="clear: both;"></div>
+			</div>
+		</div>
+
+		<div id="footer" class="ui-widget ui-widget-header ui-corner-all">
+			<p class="copyright" align="right">Facultad Politecnica -
+				Universidad Nacional de Asuncion</p>
+		</div>
+
+	</h:body>
+
+</f:view>
+</html>

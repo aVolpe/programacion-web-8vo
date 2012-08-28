@@ -1,0 +1,143 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="templates/template.xhtml">
+	<ui:define name="head">compras - WebStock</ui:define>
+	<ui:define name="content">
+		<div class="entry" style="line-height: 200%">
+			<p:growl id="growl" showDetail="true" life="3000" />
+			<h:form id="formList">
+				<p:dataTable var="compra" value="#{compraController.compras}"
+					id="comprasList" editable="true" rowKey="#{compra.id}"
+					emptyMessage="No se encontraron compras"
+					filteredValue="#{compraController.filtrados}"
+					selection="#{compraController.seleccionado}" selectionMode="single">
+					<f:facet name="header">
+			           Listado de compras
+			        </f:facet>
+					<p:column style="width:4%">
+						<p:rowToggler />
+					</p:column>
+					<p:column headerText="Proveedor" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{compra.proveedor.nombre}"
+						filterBy="#{compra.proveedor.nombre}" filterMatchMode="contains">
+						<h:outputText value="#{compra.proveedor.nombre}" />
+					</p:column>
+
+					<p:column headerText="Fecha" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{compra.fecha}"
+						filterBy="#{compra.fecha}" filterMatchMode="contains">
+						<h:outputText value="#{compra.fecha}">
+							<f:convertDateTime
+								pattern="EEEE dd 'de' MMMM 'del' yyyy 'a las' hh:mm a" />
+						</h:outputText>
+					</p:column>
+
+					<p:column headerText="Total" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{compra.total}"
+						filterBy="#{compra.total}" filterMatchMode="contains">
+						<h:outputText value="#{compra.total}" />
+					</p:column>
+
+					<p:rowExpansion>
+						<p:dataTable var="detalle" value="#{compra.detalles}">
+							<p:column headerText="Producto">
+								<h:outputText value="#{detalle.producto.nombre}" />
+							</p:column>
+
+							<p:column headerText="Cantidad">
+								<h:outputText value="#{detalle.cantidad}" />
+							</p:column>
+
+							<p:column headerText="Precio">
+								<h:outputText value="#{detalle.precio}" />
+							</p:column>
+						</p:dataTable>
+					</p:rowExpansion>
+
+					<f:facet name="footer">
+						<p:commandButton value="Agregar" update=":dialog"
+							actionListener="#{compraController.empezarNuevo}"
+							oncomplete="dlg.show()" />
+					</f:facet>
+				</p:dataTable>
+			</h:form>
+
+
+			<p:dialog id="dialog" header="Compra" widgetVar="dlg">
+				<h:form id="form">
+					<p:messages id="msgs" />
+					<h:panelGrid columns="9">
+						<h:outputLabel for="proveedores" value="Proveedor: " />
+						<p:selectOneMenu id="proveedores" required="true"
+							value="#{compraController.idProveedor}" effect="fold">
+							<f:selectItems value="#{compraController.proveedores}" var="prov"
+								itemLabel="#{prov.nombre}" itemValue="#{prov.id}" />
+						</p:selectOneMenu>
+						<p:message for="proveedores" id="msgProveedor" display="icon" />
+
+						<h:outputLabel for="fecha" value="Fecha de compra: " />
+						<p:calendar id="fecha" value="#{compraController.nuevo.fecha}"
+							label="Fecha de compra" showOn="button" />
+						<p:message for="fecha" id="msgFechaAlta" display="icon" />
+
+						<h:outputLabel for="factura" value="Factura nro: " />
+						<p:inputText id="factura" label="Factura"
+							value="#{compraController.nuevo.nroFactura}" required="true">
+							<f:validateLength minimum="5" />
+						</p:inputText>
+						<p:message for="factura" display="icon" />
+					</h:panelGrid>
+
+					<p:dataTable var="detalle" emptyMessage="Agrege filas"
+						value="#{compraController.nuevo.detalles}">
+						<p:column headerText="Producto">
+							<h:outputText value="#{detalle.producto.nombre}" />
+						</p:column>
+
+						<p:column headerText="Cantidad">
+							<h:outputText value="#{detalle.cantidad}" />
+						</p:column>
+
+						<p:column headerText="Precio">
+							<h:outputText value="#{detalle.precio}" />
+						</p:column>
+
+						<p:summaryRow>
+							<p:column colspan="2" style="text-align:right">
+								<h:outputText value="Total de compra: " />
+							</p:column>
+
+							<p:column>
+								<h:outputText value="#{compraController.nuevo.total}" />
+							</p:column>
+						</p:summaryRow>
+
+						<f:facet name="footer">
+							<p:commandButton value="Agregar" update=":dialog"
+								actionListener="#{compraController.empezarNuevo}" />
+						</f:facet>
+					</p:dataTable>
+
+					<div align="right">
+						<p:commandButton value="Guardar" />
+						<p:commandButton value="Cancelar" onclick="dlg.hide()" />
+					</div>
+				</h:form>
+			</p:dialog>
+
+		</div>
+		<script type="text/javascript">  
+		    function handleLoginRequest(xhr, status, args) {  
+		    	if(args.validationFailed) {  
+		            jQuery('#dialog').effect("shake", { times:3 }, 100);  
+		        } else {  
+		            dlg.hide();  
+		        }  
+		    }  
+		</script>
+	</ui:define>
+</ui:composition>
+
+
