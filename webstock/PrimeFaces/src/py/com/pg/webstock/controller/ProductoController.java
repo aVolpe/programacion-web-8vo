@@ -1,6 +1,6 @@
 package py.com.pg.webstock.controller;
 
-import java.util.Date;
+import java.io.Serializable;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -20,11 +20,14 @@ import javax.transaction.UserTransaction;
 
 import org.primefaces.context.RequestContext;
 
-import py.com.pg.webstock.entities.Cliente;
+import py.com.pg.webstock.entities.Producto;
+import py.com.pg.webstock.entities.Proveedor;
 
 @ManagedBean
 @ApplicationScoped
-public class ClienteController {
+public class ProductoController implements Serializable {
+
+	private static final long serialVersionUID = -2704809198045749780L;
 
 	@PersistenceContext(unitName = "WebStockJPA")
 	EntityManager em;
@@ -32,41 +35,52 @@ public class ClienteController {
 	@Resource
 	UserTransaction ut;
 
-	private Cliente cliente;
-	List<Cliente> c;
-	List<Cliente> filtrados;
-	private Cliente seleccionado;
+	private Producto producto;
 
-	public ClienteController() {
+	private int proveedor;
+
+	List<Producto> filtrados;
+
+	private Producto seleccionado;
+
+	public ProductoController() {
 		empezarNuevo();
 	}
 
-	public List<Cliente> getClientes() {
-		System.out.println("GetClientes llamado");
-		// if (c == null)
-		c = em.createQuery("select c from Cliente c", Cliente.class)
+	public List<Producto> getProductos() {
+		System.out.println("GetProductos llamado");
+		List<Producto> p = em.createQuery("select p from Producto p", Producto.class)
 				.getResultList();
-		return c;
+		System.out.println("--------------------");
+		System.out.println(p.size());
+		return p;
+	}
+
+	public List<Proveedor> getProveedores() {
+		return em.createQuery("select p from Proveedor p", Proveedor.class)
+				.getResultList();
 	}
 
 	public void empezarNuevo() {
-		cliente = new Cliente();
-		cliente.setFechaAlta(new Date());
+		producto = new Producto();
 	}
 
 	public void aceptar(ActionEvent actionEvent) throws NotSupportedException,
 			SystemException, SecurityException, IllegalStateException,
 			RollbackException, HeuristicMixedException,
 			HeuristicRollbackException {
-		System.out.println("Creando nuevo cliente");
+		System.out.println("Creando nuevo Producto");
 		ut.begin();
-		em.merge(cliente);
-//		c.add(cliente);
+		Proveedor p = em.find(Proveedor.class, proveedor);
+		producto.setProveedor(p);
+		em.merge(producto);
+
+		// c.add(Producto);
 		empezarNuevo();
 		ut.commit();
 		FacesContext.getCurrentInstance().addMessage(
 				null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Cliente",
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "Producto",
 						"Se ha guardado correctamente"));
 	}
 
@@ -75,19 +89,19 @@ public class ClienteController {
 			RollbackException, HeuristicMixedException,
 			HeuristicRollbackException {
 		if (seleccionado == null) {
-			System.out.println("No hay cliente seleccionado");
+			System.out.println("No hay Producto seleccionado");
 			return;
 		} else {
-			System.out.println("Borrando cliente: " + seleccionado.getNombre()
+			System.out.println("Borrando Producto: " + seleccionado.getNombre()
 					+ "(" + seleccionado.getId() + ")");
 		}
 		ut.begin();
 		em.remove(em.merge(seleccionado));
-//		c.remove(seleccionado);
+		// c.remove(seleccionado);
 		ut.commit();
 		FacesContext.getCurrentInstance().addMessage(
 				null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Cliente",
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "Producto",
 						"Se ha borrado correctamente"));
 	}
 
@@ -97,37 +111,46 @@ public class ClienteController {
 			HeuristicRollbackException {
 		RequestContext context = RequestContext.getCurrentInstance();
 		if (seleccionado == null) {
-			System.out.println("No hay cliente seleccionado");
-			context.addCallbackParam("puedeEditarClienteABM", false);
+			System.out.println("No hay Producto seleccionado");
+			context.addCallbackParam("puedeEditarProductoABM", false);
 			return;
 		}
-		System.out.println("Editando cliente: " + seleccionado.getNombre()
+		System.out.println("Editando Producto: " + seleccionado.getNombre()
 				+ "(" + seleccionado.getId() + ")");
-		context.addCallbackParam("puedeEditarClienteABM", true);
-		cliente = seleccionado;
+		context.addCallbackParam("puedeEditarProductoABM", true);
+		producto = seleccionado;
 	}
 
-	public Cliente getCliente() {
-		return cliente;
+	public Producto getProducto() {
+		return producto;
 	}
 
-	public void setCliente(Cliente cliente) {
-		this.cliente = cliente;
+	public void setProducto(Producto Producto) {
+		this.producto = Producto;
 	}
 
-	public Cliente getSeleccionado() {
+	public Producto getSeleccionado() {
 		return seleccionado;
 	}
 
-	public void setSeleccionado(Cliente seleccionados) {
+	public void setSeleccionado(Producto seleccionados) {
 		this.seleccionado = seleccionados;
 	}
 
-	public List<Cliente> getFiltrados() {
+	public List<Producto> getFiltrados() {
 		return filtrados;
 	}
 
-	public void setFiltrados(List<Cliente> filtrados) {
+	public void setFiltrados(List<Producto> filtrados) {
 		this.filtrados = filtrados;
 	}
+
+	public int getProveedor() {
+		return proveedor;
+	}
+
+	public void setProveedor(int proveedor) {
+		this.proveedor = proveedor;
+	}
+
 }

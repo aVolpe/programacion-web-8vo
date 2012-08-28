@@ -1,98 +1,40 @@
-<html xmlns="http://www.w3c.org/1999/xhtml"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:p="http://primefaces.org/ui">
-<h:head>
-	<link type="text/css" rel="stylesheet" href="theme.css" />
-</h:head>
-<h:body>
-	<p:growl id="growl" showDetail="true" life="3000" />
+<p:dialog id="dialog2" header="Agregar producto"
+				widgetVar="dlg_nuevo_producto">
+				<h:form id="form3">
+					<p:messages id="msgs" />
+					<h:panelGrid columns="2">
+						<h:outputLabel for="productos" value="Seleccione un producto: " />
+						<p:selectOneMenu id="productos" var="produc"
+							value="#{proveedorController.nuevoProducto}" effect="fold">
+							<f:selectItems value="#{proveedorController.productos}" />
+							<p:column>
+								<h:outputText value="#{produc.nombre}" />
+							</p:column>
 
+						</p:selectOneMenu>
+						<f:facet name="footer">
+							<p:commandButton value="Guardar" inmediate="true"
+								update=":growl, :formList:proveedorsList"
+								actionListener="#{proveedorController.aceptarButtonNewProduct}"
+								oncomplete="dlg_nuevo_producto.hide()" />
+							<p:commandButton value="Cancelar"
+								onclick="dlg_nuevo_producto.hide()" />
+						</f:facet>
+					</h:panelGrid>
 
-	<h:form id="formList">
-		<p:dataTable var="cliente" value="#{clienteController.clientes}"
-			id="clientesList" editable="true" rowKey="#{cliente.id}"
-			selection="#{clienteController.seleccionado}" selectionMode="single">
-
-			<f:facet name="header">
-			           Listado de clientes
-			        </f:facet>
-
-			<p:column headerText="Nombre" style="width:125px">
-				<h:outputText value="#{cliente.nombre}" />
-			</p:column>
-
-			<p:column headerText="RUC" style="width:125px">
-				<h:outputText value="#{cliente.ruc}" />
-			</p:column>
-
-			<p:column headerText="Telefono" style="width:125px">
-				<h:outputText value="#{cliente.telefono}" />
-			</p:column>
-			<f:facet name="footer">
-				<p:commandButton value="Agregar" onclick="dlg.show()" />
-				<p:commandButton value="Borrar" update="clientesList"
-					actionListener="#{clienteController.borrar}" />
-			</f:facet>
-		</p:dataTable>
-	</h:form>
-
-	<p:dialog id="dialog" header="Cliente" widgetVar="dlg">
-		<h:form id="form">
-			<p:messages id="msgs" />
-			<h:panelGrid columns="3">
-				<h:outputLabel for="firstname" value="Nombre: " />
-				<p:inputText id="firstname" label="Nombre de cliente"
-					value="#{clienteController.cliente.nombre}" required="true">
-					<f:validateLength minimum="5" />
-				</p:inputText>
-				<p:message for="firstname" display="icon" />
-
-				<h:outputLabel for="surname" value="R.U.C.: " />
-				<p:inputText id="surname" value="#{clienteController.cliente.ruc}"
-					label="R.U.C." required="true">
-					<f:validateLength minimum="5" />
-				</p:inputText>
-				<p:message for="surname" id="msgSurname" display="icon" />
-
-				<h:outputLabel for="telefono" value="Telefono: " />
-				<p:inputMask id="telefono"
-					value="#{clienteController.cliente.telefono}" label="Telefono"
-					required="true" mask="(9999) 999-999">
-					<f:validateLength minimum="6" />
-				</p:inputMask>
-				<p:message for="telefono" id="msgTelefono" display="icon" />
-
-				<h:outputLabel for="fechaAlta" value="Fecha de alta: " />
-				<p:calendar id="fechaAlta"
-					value="#{clienteController.cliente.fechaAlta}"
-					label="Fecha de alta" />
-				<p:message for="fechaAlta" id="msgFechaAlta" display="icon" />
-			</h:panelGrid>
-			<p:commandButton value="Guardar"
-				update=":growl, :formList:clientesList"
-				actionListener="#{clienteController.aceptar}"
-				oncomplete="handleLoginRequest(xhr, status, args)" />
-		</h:form>
-	</p:dialog>
-
-</h:body>
-
-
-<script type="text/javascript">  
-    function handleLoginRequest(xhr, status, args) {  
-    	if(args.validationFailed) {  
-            jQuery('#dialog').effect("shake", { times:3 }, 100);  
-        } else {  
-            dlg.hide();  
-        }  
-    }  
-	function permitirEditar(xhr, status, args) {
-        if (args.puedeEditarClienteABM){
-            dlg.show();
-        } else {
-            alert("Por favor, seleccione un cliente");
-            }
-    }
-</script>
-</html>
+				</h:form>
+			</p:dialog>
+			
+			
+			converter="proveedorConverter"
+			
+			<p:column>
+								<h:outputText value="#{proveedor.nombre}" />
+							</p:column>
+							
+							
+							<p:selectOneMenu id="proveedores" var="proveedor" 
+							value="#{productoController.producto.proveedor}" effect="fold" >
+							<f:selectItems value="#{productoController.proveedores}" />
+						</p:selectOneMenu>
+						<p:message for="proveedores" id="msgProveedor" display="icon" />
