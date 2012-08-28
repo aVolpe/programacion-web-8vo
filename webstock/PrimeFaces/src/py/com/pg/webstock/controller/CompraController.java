@@ -5,11 +5,14 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
 import javax.transaction.UserTransaction;
 
 import py.com.pg.webstock.entities.Compra;
@@ -28,11 +31,24 @@ public class CompraController {
 	UserTransaction ut;
 
 	Compra seleccionado;
+	DetalleCompra detalleSeleccionado;
 
 	Compra nuevo;
 
 	int idProveedor;
 	int idProducto;
+	Long cantidad;
+
+	DetalleCompra borrarDetalle;
+	List<DetalleCompra> detalles;
+
+	public List<DetalleCompra> getDetalles() {
+		return detalles;
+	}
+
+	public void setDetalles(List<DetalleCompra> detalles) {
+		this.detalles = detalles;
+	}
 
 	List<Compra> filtrados;
 
@@ -46,13 +62,17 @@ public class CompraController {
 		return em.createQuery("Select p from Proveedor p", Proveedor.class)
 				.getResultList();
 	}
-	
-	public List<Producto> getProductos(){
+
+	public List<Producto> getProductos() {
 		if (idProveedor == 0) {
 			return null;
 		}
 		Proveedor p = em.find(Proveedor.class, idProveedor);
-		return null;
+		TypedQuery<Producto> q = em.createQuery(
+				"Select p from Producto p where p.proveedor=:proveedor",
+				Producto.class);
+		q.setParameter("proveedor", p);
+		return q.getResultList();
 	}
 
 	public Compra getSeleccionado() {
@@ -71,16 +91,92 @@ public class CompraController {
 		this.filtrados = filtrados;
 	}
 
+	public void borrar(ActionEvent actionEvent) {
+		if (seleccionado == null) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Compra",
+							"Seleccione una compra"));
+			return;
+		}
+		try {
+			ut.begin();
+			List<DetalleCompra> detalles = em
+					.createQuery(
+							"select d from DetalleCompra d where d.compra=:compra",
+							DetalleCompra.class)
+					.setParameter("compra", seleccionado).getResultList();
+			for (DetalleCompra detalle : detalles) {
+				em.remove(detalle);
+			}
+			em.remove(em.find(Compra.class, seleccionado.getId()));
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Compra",
+							"Borrado con exito"));
+			ut.commit();
+			seleccionado = null;
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Compra",
+							"No se pudo borrar"));
+			e.printStackTrace();
+		}
+	}
+
+	public void aceptar(ActionEvent actionEvent) throws Exception {
+
+		ut.begin();
+		nuevo.setProveedor(em.find(Proveedor.class, idProveedor));
+		nuevo = em.merge(nuevo);
+		for (DetalleCompra dc : detalles) {
+			dc.setCompra(nuevo);
+			em.merge(dc);
+			Producto p = dc.getProducto();
+			p.setCantidad(p.getCantidad() + dc.getCantidad());
+			em.merge(p);
+		}
+		ut.commit();
+	}
+
 	public void empezarNuevo(ActionEvent actionEvent) {
 		nuevo = new Compra();
 		nuevo.setFecha(new Date());
-		List<DetalleCompra> detalles = new ArrayList<DetalleCompra>();
-		DetalleCompra d = new DetalleCompra();
-		d.setCantidad(200L);
-		d.setPrecio(200D);
-		detalles.add(d);
-		nuevo.setTotal(d.getCantidad() * d.getPrecio());
-		nuevo.setDetalles(detalles);
+		nuevo.setTotal(0D);
+		detalles = new ArrayList<DetalleCompra>();
+	}
+
+	public void agregarDetalle(ActionEvent actionEvent) {
+		DetalleCompra nuevo = new DetalleCompra();
+		nuevo.setProducto(em.find(Producto.class, idProducto));
+		nuevo.setCantidad(cantidad);
+		nuevo.setPrecio(nuevo.getProducto().getPrecioCompra());
+		detalles.add(nuevo);
+		Double total = this.nuevo.getTotal();
+		if (total == null)
+			total = new Double(0D);
+		total += nuevo.getPrecio() * nuevo.getCantidad();
+		this.nuevo.setTotal(total);
+		FacesContext.getCurrentInstance().addMessage(
+				null,
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "Compra",
+						"Detalle agregado"));
+	}
+
+	public DetalleCompra getBorrarDetalle() {
+		return borrarDetalle;
+	}
+
+	public void setBorrarDetalle(DetalleCompra detalle) {
+		borrarDetalle = detalle;
+		nuevo.setTotal(nuevo.getTotal() - detalle.getPrecio()
+				* detalle.getCantidad());
+		detalles.remove(detalle);
+		FacesContext.getCurrentInstance().addMessage(
+				null,
+				new FacesMessage(FacesMessage.SEVERITY_INFO, "Compra",
+						"Detalle eliminado"));
 	}
 
 	public int getIdProveedor() {
@@ -105,6 +201,22 @@ public class CompraController {
 
 	public void setIdProducto(int idProducto) {
 		this.idProducto = idProducto;
+	}
+
+	public Long getCantidad() {
+		return cantidad;
+	}
+
+	public void setCantidad(Long cantidad) {
+		this.cantidad = cantidad;
+	}
+
+	public DetalleCompra getDetalleSeleccionado() {
+		return detalleSeleccionado;
+	}
+
+	public void setDetalleSeleccionado(DetalleCompra detalleSeleccionado) {
+		this.detalleSeleccionado = detalleSeleccionado;
 	}
 
 }

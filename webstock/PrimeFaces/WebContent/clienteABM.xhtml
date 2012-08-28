@@ -34,10 +34,16 @@
 						<h:outputText value="#{cliente.ruc}" />
 					</p:column>
 
-					<p:column headerText="Telefono" style="width:200px"
-						filterStyle="width: 200px;" sortBy="#{cliente.telefono}"
+					<p:column headerText="Telefono" style="width:100px"
+						filterStyle="width: 100px" sortBy="#{cliente.telefono}"
 						filterBy="#{cliente.telefono}" filterMatchMode="contains">
 						<h:outputText value="#{cliente.telefono}" />
+					</p:column>
+
+					<p:column headerText="Saldo" style="width:100px"
+						filterStyle="width: 100px" sortBy="#{cliente.saldo}"
+						filterBy="#{cliente.saldo}" filterMatchMode="contains">
+						<h:outputText value="#{cliente.saldo}" />
 					</p:column>
 
 					<p:column headerText="Fecha de alta" style="width:280px"
@@ -79,6 +85,13 @@
 						</p:inputText>
 						<p:message for="surname" id="msgSurname" display="icon" />
 
+						<h:outputLabel for="saldo" value="Saldo: " />
+						<p:inputText id="saldo" value="#{clienteController.cliente.saldo}"
+							label="Saldo" required="true">
+							<f:validateLength minimum="1" />
+						</p:inputText>
+						<p:message for="saldo" id="msgSaldo" display="icon" />
+						
 						<h:outputLabel for="telefono" value="Telefono: " />
 						<p:inputMask id="telefono"
 							value="#{clienteController.cliente.telefono}" label="Telefono"

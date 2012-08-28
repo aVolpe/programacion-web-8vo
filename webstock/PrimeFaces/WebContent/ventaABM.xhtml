@@ -3,51 +3,45 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:p="http://primefaces.org/ui" template="templates/template.xhtml">
-	<ui:define name="head">compras - WebStock</ui:define>
+	<ui:define name="head">Ventas - WebStock</ui:define>
 	<ui:define name="content">
 		<div class="entry" style="line-height: 200%">
 			<p:growl id="growl" showDetail="true" life="3000" />
 			<h:form id="formList">
-				<p:dataTable var="compra" value="#{compraController.compras}"
-					id="comprasList" editable="true" rowKey="#{compra.id}"
-					emptyMessage="No se encontraron compras"
-					filteredValue="#{compraController.filtrados}"
-					selection="#{compraController.seleccionado}" selectionMode="single">
+				<p:dataTable var="venta" value="#{ventaController.ventas}"
+					id="ventasList" editable="true" rowKey="#{venta.id}"
+					emptyMessage="No se encontraron ventas"
+					filteredValue="#{ventaController.filtrados}"
+					selection="#{ventaController.seleccionado}" selectionMode="single">
 					<f:facet name="header">
-			           Listado de compras
+			           Listado de ventas
 			        </f:facet>
 					<p:column style="width:4%">
 						<p:rowToggler />
 					</p:column>
-					<p:column headerText="Proveedor" style="width:200px"
-						filterStyle="width: 200px;" sortBy="#{compra.proveedor.nombre}"
-						filterBy="#{compra.proveedor.nombre}" filterMatchMode="contains">
-						<h:outputText value="#{compra.proveedor.nombre}" />
+					<p:column headerText="Cliente" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{venta.cliente.nombre}"
+						filterBy="#{venta.cliente.nombre}" filterMatchMode="contains">
+						<h:outputText value="#{venta.cliente.nombre}" />
 					</p:column>
 
 					<p:column headerText="Fecha" style="width:200px"
-						filterStyle="width: 200px;" sortBy="#{compra.fecha}"
-						filterBy="#{compra.fecha}" filterMatchMode="contains">
-						<h:outputText value="#{compra.fecha}">
+						filterStyle="width: 200px;" sortBy="#{venta.fecha}"
+						filterBy="#{venta.fecha}" filterMatchMode="contains">
+						<h:outputText value="#{venta.fecha}">
 							<f:convertDateTime
 								pattern="EEEE dd 'de' MMMM 'del' yyyy 'a las' hh:mm a" />
 						</h:outputText>
 					</p:column>
 
-					<p:column headerText="Factura" style="width:100px"
-						filterStyle="width: 100px;" sortBy="#{compra.nroFactura}"
-						filterBy="#{compra.nroFactura}" filterMatchMode="contains">
-						<h:outputText value="#{compra.nroFactura}" />
-					</p:column>
-
-					<p:column headerText="Total" style="width:100px"
-						filterStyle="width: 100px;" sortBy="#{compra.total}"
-						filterBy="#{compra.total}" filterMatchMode="contains">
-						<h:outputText value="#{compra.total}" />
+					<p:column headerText="Total" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{venta.total}"
+						filterBy="#{venta.total}" filterMatchMode="contains">
+						<h:outputText value="#{venta.total}" />
 					</p:column>
 
 					<p:rowExpansion>
-						<p:dataTable var="detalle" value="#{compra.detalles}">
+						<p:dataTable var="detalle" value="#{venta.detalles}">
 							<p:column headerText="Producto">
 								<h:outputText value="#{detalle.producto.nombre}" />
 							</p:column>
@@ -64,53 +58,45 @@
 
 					<f:facet name="footer">
 						<p:commandButton value="Agregar" update=":dialog"
-							actionListener="#{compraController.empezarNuevo}"
+							actionListener="#{ventaController.empezarNuevo}"
 							oncomplete="dlg.show()" />
-						<p:commandButton value="Borrar" update=":growl, comprasList"
-							actionListener="#{compraController.borrar}" />
 					</f:facet>
 				</p:dataTable>
 			</h:form>
 
 
-			<p:dialog id="dialog" header="Compra" widgetVar="dlg">
+			<p:dialog id="dialog" header="Venta" widgetVar="dlg">
 				<h:form id="form">
 					<div align="right">
 						<p:commandButton value="Guardar"
-							update=":growl, :formList:comprasList"
-							actionListener="#{compraController.aceptar}"
+							update=":growl, :formList:ventasList"
+							actionListener="#{ventaController.aceptar}"
 							oncomplete="handleAceptarRequest(xhr, status, args)" />
 						<p:commandButton value="Cancelar" onclick="dlg.hide()" />
 					</div>
 					<p:messages id="msgs" />
 					<h:panelGrid columns="9">
-						<h:outputLabel for="proveedores" value="Proveedor: " />
-						<p:selectOneMenu id="proveedores" required="true"
-							value="#{compraController.idProveedor}" effect="fold">
-							<f:selectItems value="#{compraController.proveedores}" var="prov"
+						<h:outputLabel for="clientes" value="Cliente: " />
+						<p:selectOneMenu id="clientes" required="true"
+							value="#{ventaController.idCliente}" effect="fold">
+							<f:selectItems value="#{ventaController.clientes}" var="prov"
 								itemLabel="#{prov.nombre}" itemValue="#{prov.id}" />
 							<p:ajax event="change" update=":formNuevoDetalle:productos" />
 						</p:selectOneMenu>
-						<p:message for="proveedores" id="msgProveedor" display="icon" />
+						<p:message for="clientes" id="msgProveedor" display="icon" />
 
-						<h:outputLabel for="fecha" value="Fecha de compra: " />
-						<p:calendar id="fecha" value="#{compraController.nuevo.fecha}"
-							label="Fecha de compra" showOn="button" />
+						<h:outputLabel for="fecha" value="Fecha de venta: " />
+						<p:calendar id="fecha" value="#{ventaController.nuevo.fecha}"
+							label="Fecha de venta" showOn="button" />
 						<p:message for="fecha" id="msgFechaAlta" display="icon" />
 
-						<h:outputLabel for="factura" value="Factura nro: " />
-						<p:inputText id="factura" label="Factura"
-							value="#{compraController.nuevo.nroFactura}" required="true">
-							<f:validateLength minimum="5" />
-						</p:inputText>
-						<p:message for="factura" display="icon" />
 					</h:panelGrid>
 				</h:form>
 				<h:form id="formDetalleCompra">
 					<p:dataTable id="dtDetalle" var="detalle"
-						emptyMessage="Agrege filas" value="#{compraController.detalles}"
-						rowKey="#{detalle.id}"
-						selection="#{compraController.detalleSeleccionado}"
+						emptyMessage="Agrege filas"
+						value="#{ventaController.detalles}" rowKey="#{detalle.id}"
+						selection="#{ventaController.detalleSeleccionado}"
 						selectionMode="single">
 						<p:column headerText="Producto">
 							<h:outputText value="#{detalle.producto.nombre}" />
@@ -121,7 +107,7 @@
 						</p:column>
 
 						<p:column headerText="Precio"
-							footerText="#{compraController.nuevo.total}">
+							footerText="#{ventaController.nuevo.total}">
 							<h:outputText value="#{detalle.precio}" />
 						</p:column>
 
@@ -129,7 +115,7 @@
 							<p:commandLink update="dtDetalle, :growl" title="Borrar detalle"
 								styleClass="ui-icon ui-icon-search">
 								<f:setPropertyActionListener value="#{detalle}"
-									target="#{compraController.borrarDetalle}" />
+									target="#{ventaController.borrarDetalle}" />
 							</p:commandLink>
 						</p:column>
 
@@ -142,21 +128,21 @@
 					<div align="right">
 						<h:outputLabel for="productos" value="Producto: " />
 						<p:selectOneMenu id="productos" required="true"
-							value="#{compraController.idProducto}" effect="fold"
+							value="#{ventaController.idProducto}" effect="fold"
 							style="width:200px">
-							<f:selectItems value="#{compraController.productos}" var="prod"
+							<f:selectItems value="#{ventaController.productos}" var="prod"
 								itemLabel="#{prod.nombre}" itemValue="#{prod.id}" />
 						</p:selectOneMenu>
 
 						<h:outputLabel for="cantidad" value="Cantidad: " />
 						<p:inputText id="cantidad" label="Cantidad"
-							value="#{compraController.cantidad}" required="true">
+							value="#{ventaController.cantidad}" required="true">
 							<f:validateLength minimum="1" />
 						</p:inputText>
 						<p:message for="cantidad" display="icon" />
 						<p:commandButton value="Agregar"
 							update=":formDetalleCompra:dtDetalle, :growl"
-							actionListener="#{compraController.agregarDetalle}" />
+							actionListener="#{ventaController.agregarDetalle}" />
 					</div>
 				</h:form>
 			</p:dialog>
@@ -164,7 +150,7 @@
 		</div>
 		<script type="text/javascript">  
 		    function handleAceptarRequest(xhr, status, args) {  
-		    	if(args.validationFailed) {  
+		    	if(args.validationFailed || args.fallo) {  
 		            jQuery('#dialog').effect("shake", { times:3 }, 100);  
 		        } else {  
 		            dlg.hide();  

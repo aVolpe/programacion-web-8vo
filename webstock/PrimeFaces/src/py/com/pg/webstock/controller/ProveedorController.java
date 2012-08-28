@@ -74,10 +74,7 @@ public class ProveedorController implements Serializable {
 						"Se ha guardado correctamente"));
 	}
 
-	public void borrar(ActionEvent actionEvent) throws NotSupportedException,
-			SystemException, SecurityException, IllegalStateException,
-			RollbackException, HeuristicMixedException,
-			HeuristicRollbackException {
+	public void borrar(ActionEvent actionEvent) throws Exception {
 		if (seleccionado == null) {
 			System.out.println("No hay Proveedor seleccionado");
 			return;
@@ -86,14 +83,22 @@ public class ProveedorController implements Serializable {
 					+ seleccionado.getNombre() + "(" + seleccionado.getId()
 					+ ")");
 		}
-		ut.begin();
-		em.remove(em.merge(seleccionado));
-		// c.remove(seleccionado);
-		ut.commit();
-		FacesContext.getCurrentInstance().addMessage(
-				null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Proveedor",
-						"Se ha borrado correctamente"));
+		try {
+			ut.begin();
+			em.remove(em.merge(seleccionado));
+			// c.remove(seleccionado);
+			ut.commit();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Proveedor",
+							"Se ha borrado correctamente"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "Proveedor",
+							"NO se puede borrar el proveedor"));
+		}
 	}
 
 	public void editar(ActionEvent actionEvent) throws NotSupportedException,

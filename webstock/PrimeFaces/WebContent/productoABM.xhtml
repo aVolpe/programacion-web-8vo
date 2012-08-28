@@ -11,12 +11,11 @@
 
 			<h:form id="formList">
 				<p:dataTable var="producto" value="#{productoController.productos}"
-					id="productosList" editable="true" rowKey="#{producto.id}"
+					id="productosList" rowKey="#{producto.id}"
 					emptyMessage="No se encontraron productos"
 					filteredValue="#{productoController.filtrados}"
 					selection="#{productoController.seleccionado}"
 					selectionMode="single">
-
 					<f:facet name="header">
 					           Listado de productos
 					        </f:facet>
@@ -39,6 +38,17 @@
 						<h:outputText value="#{producto.proveedor.nombre}" />
 					</p:column>
 
+					<p:column headerText="Precio Compra" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{producto.precioCompra}"
+						filterBy="#{producto.precioCompra}" filterMatchMode="contains">
+						<h:outputText value="#{producto.precioCompra}" />
+					</p:column>
+
+					<p:column headerText="Precio Venta" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{producto.precioVenta}"
+						filterBy="#{producto.precioVenta}" filterMatchMode="contains">
+						<h:outputText value="#{producto.precioVenta}" />
+					</p:column>
 
 					<f:facet name="footer">
 						<p:commandButton value="Agregar" update=":dialog"
@@ -71,6 +81,23 @@
 							<f:validateLength minimum="1" />
 						</p:inputText>
 						<p:message for="cantidad" id="msgSurname" display="icon" />
+						
+						<h:outputLabel for="precioCompra" value="Precio compra: " />
+						<p:inputText id="precioCompra"
+							value="#{productoController.producto.precioCompra}" label="Precio Compra"
+							required="true">
+							<f:validateLength minimum="1" />
+						</p:inputText>
+						<p:message for="precioCompra" id="msgPreciaCompra" display="icon"/>
+						
+						<h:outputLabel for="precioVenta" value="Precio venta: " />
+						<p:inputText id="precioVenta"
+							value="#{productoController.producto.precioVenta}" label="Precio Venta"
+							required="true">
+							<f:validateLength minimum="1" />
+						</p:inputText>
+						<p:message for="precioVenta" id="msgPreciaVenta" display="icon"/>
+						
 
 						<h:outputLabel for="proveedores" value="Proveedor: " />
 
@@ -94,22 +121,24 @@
 				</h:form>
 			</p:dialog>
 		</div>
-		<script type="text/javascript">  
-	    function handleLoginRequest(xhr, status, args) {  
-		    
-	    	if(args.validationFailed) {  
-	            jQuery('#dialog').effect("shake", { times:3 }, 100);  
-	        } else {  
-	            dlg.hide();  
-	        }  
-	    }  
-		function permitirEditar(xhr, status, args) {
-	        if (args.puedeEditarProductoABM){
-	            dlg.show();
-	        } else {
-	            alert("Por favor, seleccione un producto");
-	            }
-	    }
-	</script>
+		<script type="text/javascript">
+			function handleLoginRequest(xhr, status, args) {
+
+				if (args.validationFailed) {
+					jQuery('#dialog').effect("shake", {
+						times : 3
+					}, 100);
+				} else {
+					dlg.hide();
+				}
+			}
+			function permitirEditar(xhr, status, args) {
+				if (args.puedeEditarProductoABM) {
+					dlg.show();
+				} else {
+					alert("Por favor, seleccione un producto");
+				}
+			}
+		</script>
 	</ui:define>
 </ui:composition>
