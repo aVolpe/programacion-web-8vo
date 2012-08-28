@@ -49,8 +49,8 @@ public class ProductoController implements Serializable {
 
 	public List<Producto> getProductos() {
 		System.out.println("GetProductos llamado");
-		List<Producto> p = em.createQuery("select p from Producto p", Producto.class)
-				.getResultList();
+		List<Producto> p = em.createQuery("select p from Producto p",
+				Producto.class).getResultList();
 		System.out.println("--------------------");
 		System.out.println(p.size());
 		return p;
@@ -84,25 +84,31 @@ public class ProductoController implements Serializable {
 						"Se ha guardado correctamente"));
 	}
 
-	public void borrar(ActionEvent actionEvent) throws NotSupportedException,
-			SystemException, SecurityException, IllegalStateException,
-			RollbackException, HeuristicMixedException,
-			HeuristicRollbackException {
-		if (seleccionado == null) {
-			System.out.println("No hay Producto seleccionado");
-			return;
-		} else {
-			System.out.println("Borrando Producto: " + seleccionado.getNombre()
-					+ "(" + seleccionado.getId() + ")");
+	public void borrar(ActionEvent actionEvent) throws Exception {
+		try {
+			if (seleccionado == null) {
+				System.out.println("No hay Producto seleccionado");
+				return;
+			} else {
+				System.out.println("Borrando Producto: "
+						+ seleccionado.getNombre() + "(" + seleccionado.getId()
+						+ ")");
+			}
+			ut.begin();
+			em.remove(em.merge(seleccionado));
+			// c.remove(seleccionado);
+			ut.commit();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Producto",
+							"Se ha borrado correctamente"));
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Producto",
+							"No se pudo borrar. " + e.getMessage()));
+			e.printStackTrace();
 		}
-		ut.begin();
-		em.remove(em.merge(seleccionado));
-		// c.remove(seleccionado);
-		ut.commit();
-		FacesContext.getCurrentInstance().addMessage(
-				null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Producto",
-						"Se ha borrado correctamente"));
 	}
 
 	public void editar(ActionEvent actionEvent) throws NotSupportedException,

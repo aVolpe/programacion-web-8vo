@@ -1,0 +1,124 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:p="http://primefaces.org/ui" template="templates/template.xhtml">
+	<ui:define name="head">Clientes - WebStock</ui:define>
+	<ui:define name="content">
+		<div class="entry" style="line-height: 200%">
+			<p:growl id="growl" showDetail="true" life="3000" />
+			<h:form enctype="multipart/form-data">
+
+				<p:fileUpload label="Agregar" uploadLabel="Subir"
+					cancelLabel="Cancelar"
+					fileUploadListener="#{pagoController.cargarArchivo}"
+					mode="advanced" update=":growl, :formList:pagosList"
+					sizeLimit="100000" allowTypes="/(\.|\/)(txt)$/" />
+			</h:form>
+
+
+			<h:form id="formList">
+				<p:dataTable var="pago" value="#{pagoController.pagos}"
+					id="pagosList" rowKey="#{pago.id}"
+					emptyMessage="No se encontraron pagos"
+					filteredValue="#{pagoController.filtrados}"
+					selection="#{pagoController.seleccionado}" selectionMode="single">
+					<f:facet name="header">
+					           Listado de pagos
+					        </f:facet>
+
+					<p:column headerText="Codigo" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{pago.codPago}"
+						filterBy="#{pago.codPago}" filterMatchMode="contains">
+						<h:outputText value="#{pago.codPago}" />
+					</p:column>
+
+					<p:column headerText="Cliente" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{pago.cliente.nombre}"
+						filterBy="#{pago.cliente.nombre}" filterMatchMode="contains">
+						<h:outputText value="#{pago.cliente.nombre}" />
+					</p:column>
+
+					<p:column headerText="Monto" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{pago.monto}"
+						filterBy="#{pago.monto}" filterMatchMode="contains">
+						<h:outputText value="#{pago.monto}" />
+					</p:column>
+
+					<p:column headerText="Fecha de pago" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{pago.fecha}"
+						filterBy="#{pago.fecha}" filterMatchMode="contains">
+						<h:outputText value="#{pago.fecha}" />
+					</p:column>
+
+					<p:column headerText="Mensaje" style="width:200px"
+						filterStyle="width: 200px;" sortBy="#{pago.mensaje}"
+						filterBy="#{pago.mensaje}" filterMatchMode="contains">
+						<h:outputText value="#{pago.mensaje}" />
+					</p:column>
+
+					<f:facet name="footer">
+						<p:commandButton value="Agregar"
+							actionListener="#{pagoController.empezarNuevo}"
+							oncomplete="dlg.show()" />
+						<p:commandButton value="Borrar" update="pagosList, :growl"
+							actionListener="#{pagoController.borrar}" />
+					</f:facet>
+				</p:dataTable>
+			</h:form>
+
+			<p:dialog id="dialog" header="Pago" widgetVar="dlg">
+				<h:form id="form">
+					<p:messages id="msgs" />
+					<h:panelGrid columns="3">
+						<h:outputLabel for="codPago" value="Codigo de Pago: " />
+						<p:inputText id="codPago" label="Codigo de Pago: "
+							value="#{pagoController.nuevo.codPago}" required="true">
+							<f:validateLength minimum="1" />
+						</p:inputText>
+						<p:message for="codPago" display="icon" />
+
+						<h:outputLabel for="cliente" value="Cliente:  " />
+						<p:selectOneMenu id="cliente" required="true" style="width:155px"
+							value="#{pagoController.idCliente}" effect="fold">
+							<f:selectItems value="#{pagoController.clientes}" var="cli"
+								itemLabel="#{cli.nombre}" itemValue="#{cli.id}" />
+						</p:selectOneMenu>
+						<p:message for="cliente" id="msgCliente" display="icon" />
+
+						<h:outputLabel for="monto" value="Monto: " />
+						<p:inputText id="monto" value="#{pagoController.nuevo.monto}"
+							label="Monto" required="true">
+							<f:validateLength minimum="1" />
+						</p:inputText>
+						<p:message for="monto" id="msgSurname" display="icon" />
+
+						<h:outputLabel for="fecha" value="Fecha: " />
+						<p:calendar id="fecha" value="#{pagoController.nuevo.fecha}"
+							label="Fecha" showOn="button" />
+						<p:message for="fecha" id="msgFecha" display="icon" />
+
+						<f:facet name="footer">
+							<p:commandButton value="Guardar"
+								update=":growl, :formList:pagosList"
+								actionListener="#{pagoController.aceptar}"
+								oncomplete="handleAceptar(xhr, status, args)" />
+							<p:commandButton value="Cancelar" onclick="dlg.hide()" />
+						</f:facet>
+					</h:panelGrid>
+
+				</h:form>
+			</p:dialog>
+		</div>
+		<script type="text/javascript">  
+		    function handleAceptar(xhr, status, args) {  
+		    	if(args.validationFailed) {  
+		            jQuery('#dialog').effect("shake", { times:3 }, 100);  
+		        } else {  
+		            dlg.hide();  
+		        }  
+		    }  
+			</script>
+
+	</ui:define>
+</ui:composition>

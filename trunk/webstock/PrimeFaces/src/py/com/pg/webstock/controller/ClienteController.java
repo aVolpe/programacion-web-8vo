@@ -61,7 +61,7 @@ public class ClienteController {
 		System.out.println("Creando nuevo cliente");
 		ut.begin();
 		em.merge(cliente);
-//		c.add(cliente);
+		// c.add(cliente);
 		empezarNuevo();
 		ut.commit();
 		FacesContext.getCurrentInstance().addMessage(
@@ -81,14 +81,21 @@ public class ClienteController {
 			System.out.println("Borrando cliente: " + seleccionado.getNombre()
 					+ "(" + seleccionado.getId() + ")");
 		}
-		ut.begin();
-		em.remove(em.merge(seleccionado));
-//		c.remove(seleccionado);
-		ut.commit();
-		FacesContext.getCurrentInstance().addMessage(
-				null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Cliente",
-						"Se ha borrado correctamente"));
+		try {
+			ut.begin();
+			em.remove(em.merge(seleccionado));
+			ut.commit();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_INFO, "Cliente",
+							"Se ha borrado correctamente"));
+		} catch (Exception e) {
+			e.printStackTrace();
+			FacesContext.getCurrentInstance().addMessage(
+					null,
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "Cliente",
+							"NO se puede borrar el cliente"));
+		}
 	}
 
 	public void editar(ActionEvent actionEvent) throws NotSupportedException,
