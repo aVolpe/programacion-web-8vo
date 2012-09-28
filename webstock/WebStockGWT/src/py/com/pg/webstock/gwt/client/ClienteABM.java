@@ -12,6 +12,7 @@ import py.com.pg.webstock.gwt.client.service.ClienteServiceAsync;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -97,6 +98,7 @@ public class ClienteABM implements IsWidget {
 		// TODO ver como hacer dinamico
 		g.setHeight(800);
 		// agregamos el toolbar y el grid a la vista, lo agregara arriba
+		Document.get().setTitle("Clientes - WebStock");
 		con.add(bb);
 		con.add(g);
 		return con;

@@ -1,23 +1,24 @@
 package py.com.pg.webstock.gwt.client;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
+import py.com.pg.webstock.entities.Producto;
 import py.com.pg.webstock.entities.Proveedor;
-import py.com.pg.webstock.gwt.client.access.ProveedorPA;
+import py.com.pg.webstock.gwt.client.access.ProductoPA;
 import py.com.pg.webstock.gwt.client.images.Recursos;
-import py.com.pg.webstock.gwt.client.service.ProveedorService;
-import py.com.pg.webstock.gwt.client.service.ProveedorServiceAsync;
+import py.com.pg.webstock.gwt.client.service.ProductoService;
+import py.com.pg.webstock.gwt.client.service.ProductoServiceAsync;
 
-import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
-import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.ButtonCell.IconAlign;
+import com.sencha.gxt.cell.core.client.form.SpinnerFieldCell;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
@@ -27,8 +28,8 @@ import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent.CompleteEditHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
-import com.sencha.gxt.widget.core.client.form.DateField;
-import com.sencha.gxt.widget.core.client.form.DateTimePropertyEditor;
+import com.sencha.gxt.widget.core.client.form.NumberField;
+import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor.LongPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
@@ -44,28 +45,25 @@ import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
  * @author Arturo
  * 
  */
-public class ProveedorABM implements IsWidget {
+public class ProductoABM implements IsWidget {
 
 	/**
 	 * ver documetnacion de la clase
 	 * 
 	 */
-	public static final ProveedorPA pa = GWT.create(ProveedorPA.class);
+	public static final ProductoPA pa = GWT.create(ProductoPA.class);
 
 	// Aca le decimso al GWT qeu cree el servicio, y el hace la magia!
 	// Atender qeu nos retorna un ASYNC pero le pasamos el no Asincronos
-	ProveedorServiceAsync clienteService = GWT.create(ProveedorService.class);
+	ProductoServiceAsync productoService = GWT.create(ProductoService.class);
 
-	ListStore<Proveedor> store;
+	ListStore<Producto> store;
 
-	Grid<Proveedor> g;
+	Grid<Producto> g;
 
 	ToolBar bb;
 
-	GridRowEditing<Proveedor> editing;
-
-	private static final DateTimeFormat fmt = DateTimeFormat
-			.getFormat("EEEE, dd 'de' MMMM 'del' yyyy");
+	GridRowEditing<Producto> editing;
 
 	@Override
 	public Widget asWidget() {
@@ -73,14 +71,13 @@ public class ProveedorABM implements IsWidget {
 		// agregamos
 		VerticalLayoutContainer con = new VerticalLayoutContainer();
 		// Aca se almacenan todos los valores que seran mostrados en el grid
-		store = new ListStore<Proveedor>(pa.key());
+		store = new ListStore<Producto>(pa.key());
 		// este es el modlo de las columnas, usamos el por defecto par ano armar
 		// bardo
-		ColumnModel<Proveedor> cm = new ColumnModel<Proveedor>(
-				getColumnConfig());
+		ColumnModel<Producto> cm = new ColumnModel<Producto>(getColumnConfig());
 		// Grilla en si, le pasamos el store donde estan los componentes y la
 		// configuracion de las columnas
-		g = new Grid<Proveedor>(store, cm);
+		g = new Grid<Producto>(store, cm);
 		//
 
 		// esto le dice que la columna NOMBRE se exapndira cuando hya mucho
@@ -96,29 +93,30 @@ public class ProveedorABM implements IsWidget {
 		// agregamos el toolbar y el grid a la vista, lo agregara arriba
 		con.add(bb);
 		con.add(g);
-		Document.get().setTitle("Proveedores - WebStock");
+		Document.get().setTitle("Productos - WebStock");
 		return con;
 	}
 
 	private void cargarStores() {
-		clienteService.getEntidades(new AsyncCallback<List<Proveedor>>() {
+		productoService.getEntidades(new AsyncCallback<List<Producto>>() {
 			@Override
-			public void onSuccess(List<Proveedor> result) {
+			public void onSuccess(List<Producto> result) {
 				store.addAll(result);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
-				Info.display("Proveedors", "no se pudo cargar clientes");
+				Info.display("Productos", "no se pudo cargar productos");
 			}
 		});
 
 	}
 
-	ColumnConfig<Proveedor, String> nombre;
-	ColumnConfig<Proveedor, String> ruc;
-	ColumnConfig<Proveedor, String> telefono;
-	ColumnConfig<Proveedor, Date> fecha;
+	ColumnConfig<Producto, String> nombre;
+	ColumnConfig<Producto, Long> cantidad;
+	ColumnConfig<Producto, Proveedor> proveedor;
+	ColumnConfig<Producto, Double> precioCompra;
+	ColumnConfig<Producto, Double> precioVenta;
 
 	/**
 	 * ColumnConfig es la configuracion de Columnas, debe ser una lista donde
@@ -137,21 +135,33 @@ public class ProveedorABM implements IsWidget {
 	 * 
 	 * @return
 	 */
-	public List<ColumnConfig<Proveedor, ?>> getColumnConfig() {
-		nombre = new ColumnConfig<Proveedor, String>(pa.nombre(), 150, "Nombre");
-		ruc = new ColumnConfig<Proveedor, String>(pa.ruc(), 150, "RUC");
-		telefono = new ColumnConfig<Proveedor, String>(pa.telefono(), 150,
-				"Telefono");
-		fecha = new ColumnConfig<Proveedor, Date>(pa.fechaAlta(), 250,
-				"Fecha de alta");
+	public List<ColumnConfig<Producto, ?>> getColumnConfig() {
+		nombre = new ColumnConfig<Producto, String>(pa.nombre(), 150, "Nombre");
+		cantidad = new ColumnConfig<Producto, Long>(pa.cantidad(), 150,
+				"Cantidad");
+		proveedor = new ColumnConfig<Producto, Proveedor>(pa.proveedor(), 150,
+				"Proveedor");
+		proveedor.setCell(new AbstractCell<Proveedor>() {
+			@Override
+			public void render(Context context, Proveedor value,
+					SafeHtmlBuilder sb) {
+				if (value == null)
+					return;
+				else
+					sb.appendEscaped(value.getNombre());
+			}
+		});
+		precioCompra = new ColumnConfig<Producto, Double>(pa.precioCompra(),
+				250, "Precio de compra");
+		precioVenta = new ColumnConfig<Producto, Double>(pa.precioVenta(), 250,
+				"Precio de venta");
 
-		fecha.setCell(new DateCell(fmt));
-
-		List<ColumnConfig<Proveedor, ?>> aRet = new ArrayList<ColumnConfig<Proveedor, ?>>();
+		List<ColumnConfig<Producto, ?>> aRet = new ArrayList<ColumnConfig<Producto, ?>>();
 		aRet.add(nombre);
-		aRet.add(ruc);
-		aRet.add(telefono);
-		aRet.add(fecha);
+		aRet.add(cantidad);
+		aRet.add(proveedor);
+		aRet.add(precioCompra);
+		aRet.add(precioVenta);
 		return aRet;
 
 	}
@@ -161,37 +171,41 @@ public class ProveedorABM implements IsWidget {
 	 * interesante de esta clase del orte
 	 */
 	public void configEditing() {
-		editing = new GridRowEditing<Proveedor>(g);
+		editing = new GridRowEditing<Producto>(g);
 
 		TextField tfNombre = new TextField();
 		tfNombre.setEmptyText("Ingrese el nombre");
 		editing.addEditor(nombre, tfNombre);
 
-		TextField tfRuc = new TextField();
-		tfRuc.setEmptyText("Ingrese el RUC");
-		editing.addEditor(ruc, tfRuc);
+		SpinnerFieldCell<Long> sfc = new SpinnerFieldCell<Long>(
+				new LongPropertyEditor());
 
-		TextField tfTelefono = new TextField();
-		tfTelefono.setEmptyText("Ingrese el Telefono");
-		editing.addEditor(telefono, tfTelefono);
+		NumberField<Long> nfCantidad = new NumberField<Long>(sfc,
+				sfc.getPropertyEditor());
 
-		DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
-		dateField.setClearValueOnParseError(false);
-		editing.addEditor(fecha, dateField);
-
-		editing.addCompleteEditHandler(new CompleteEditHandler<Proveedor>() {
+		nfCantidad.setEmptyText("Ingrese la cantidad");
+		
+		editing.addEditor(cantidad, nfCantidad);
+		//
+		// TextField tfRuc = new TextField();
+		// tfRuc.setEmptyText("Ingrese el RUC");
+		// editing.addEditor(ruc, tfRuc);
+		//
+		// TextField tfTelefono = new TextField();
+		// tfTelefono.setEmptyText("Ingrese el Telefono");
+		// editing.addEditor(telefono, tfTelefono);
+		//
+		// DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
+		// dateField.setClearValueOnParseError(false);
+		// editing.addEditor(fecha, dateField);
+		//
+		editing.addCompleteEditHandler(new CompleteEditHandler<Producto>() {
 
 			@Override
-			public void onCompleteEdit(CompleteEditEvent<Proveedor> event) {
+			public void onCompleteEdit(CompleteEditEvent<Producto> event) {
 				// guarda todos lso cambios en el store, asi podemos obtener el
 				// cilnete cambiado
 				store.commitChanges();
-				/**
-				 * esta linea me tomo 3 meses construir, lo que hace es: <Br>
-				 * 1. Obtiene la fila que se esta editando <br>
-				 * 2. La busca en el store, el store se actualiza
-				 * automaticamente y su orden es el orden donde se muestra
-				 */
 				editadoCompleto(store.get(event.getEditCell().getRow()));
 			}
 		});
@@ -208,7 +222,7 @@ public class ProveedorABM implements IsWidget {
 		tbAdd.addSelectHandler(new SelectHandler() {
 			@Override
 			public void onSelect(SelectEvent event) {
-				Proveedor nuevo = new Proveedor();
+				Producto nuevo = new Producto();
 				store.add(nuevo);
 				int index = store.indexOf(nuevo);
 				editing.startEditing(new GridCell(index, 0));
@@ -233,46 +247,46 @@ public class ProveedorABM implements IsWidget {
 
 	}
 
-	public void editadoCompleto(final Proveedor c) {
+	public void editadoCompleto(final Producto c) {
 		// nuevo
 		if (c.getId() == 0)
-			clienteService.add(c, new GuardarCallBack(c));
+			productoService.add(c, new GuardarCallBack(c));
 		else
-			clienteService.update(c, new GuardarCallBack(c));
+			productoService.update(c, new GuardarCallBack(c));
 	}
 
-	public void eliminar(final Proveedor entidad) {
-		clienteService.remove(entidad, new AsyncCallback<Proveedor>() {
+	public void eliminar(final Producto entidad) {
+		productoService.remove(entidad, new AsyncCallback<Producto>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				Info.display("Proveedors", "Eliminacion fallada, reintente");
+				Info.display("Productos", "Eliminacion fallada, reintente");
 			}
 
 			@Override
-			public void onSuccess(Proveedor result) {
-				Info.display("Proveedors", "Eliminacion correcta");
+			public void onSuccess(Producto result) {
+				Info.display("Productos", "Eliminacion correcta");
 				store.remove(entidad);
 				editing.cancelEditing();
 			}
 		});
 	}
 
-	public static class GuardarCallBack implements AsyncCallback<Proveedor> {
-		Proveedor c;
+	public static class GuardarCallBack implements AsyncCallback<Producto> {
+		Producto c;
 
-		public GuardarCallBack(Proveedor c) {
+		public GuardarCallBack(Producto c) {
 			this.c = c;
 		}
 
 		@Override
-		public void onSuccess(Proveedor result) {
+		public void onSuccess(Producto result) {
 			c.setId(result.getId());
-			Info.display("Proveedors", "Guardado");
+			Info.display("Productos", "Guardado");
 		}
 
 		@Override
 		public void onFailure(Throwable caught) {
-			Info.display("Proveedors", "Imposible guardar, reintente");
+			Info.display("Productos", "Imposible guardar, reintente");
 		}
 	}
 }
