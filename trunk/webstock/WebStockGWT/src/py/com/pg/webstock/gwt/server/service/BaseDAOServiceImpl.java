@@ -1,6 +1,9 @@
 package py.com.pg.webstock.gwt.server.service;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -39,7 +42,7 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> getEntidades() {
-		return session.createCriteria(getClase()).list();
+		return filter(session.createCriteria(getClase()).list());
 	}
 
 	@Override
@@ -111,7 +114,76 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 
 	@SuppressWarnings("unchecked")
 	public List<T> getByExample(T example) {
-		return session.createCriteria(getClase()).add(Example.create(example))
-				.list();
+		return filter(session.createCriteria(getClase())
+				.add(Example.create(example)).list());
+	}
+
+	/**
+	 * Ve para borrar las listas y cosas asi que no pueden ser enviadas al
+	 * cliente pues no pueden ser serializadas, pues son lazys! tipo el examen
+	 * 
+	 * @param lista
+	 * @return
+	 */
+	public List<T> filter(List<T> lista) {
+		try {
+			ArrayList<Field> aCerar = null;
+			ArrayList<Field> aLimpiar = null;
+			for (T entidad : lista) {
+				if (aCerar == null) {
+					aCerar = new ArrayList<Field>();
+					aLimpiar = new ArrayList<Field>();
+					Class<T> clase = getClase();
+					// esto esta mal, no retorna lso fields de entidades
+					// heredadas.
+					for (Field f : clase.getDeclaredFields()) {
+						if (f.getType() == List.class) {
+							f.setAccessible(true);
+							aCerar.add(f);
+						}
+						if (BaseEntity.class.isAssignableFrom(f.getType())) {
+							f.setAccessible(true);
+							aLimpiar.add(f);
+						}
+					}
+				}
+				for (Field f : aCerar) {
+					f.set(entidad, null);
+				}
+				for (Field f : aLimpiar) {
+					f.set(entidad, crearInstanciaLimpia(f.get(entidad)));
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return lista;
+	}
+
+	public Object crearInstanciaLimpia(Object objeto) {
+		if (objeto == null)
+			return null;
+		try {
+			Class<?> clase = (Class<?>) objeto.getClass();
+			Object nuevo = clase.newInstance();
+			for (Field f : clase.getDeclaredFields()) {
+				// si es estatico omito
+				if (Modifier.isStatic(f.getModifiers()))
+					continue;
+				// si es una lista omito
+				if (f.getType() == List.class)
+					continue;
+				// si es otra entidad omito
+				if (BaseEntity.class.isAssignableFrom(f.getType()))
+					continue;
+				f.setAccessible(true);
+				Object o = f.get(objeto);
+				f.set(nuevo, o);
+			}
+			return nuevo;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return objeto;
 	}
 }

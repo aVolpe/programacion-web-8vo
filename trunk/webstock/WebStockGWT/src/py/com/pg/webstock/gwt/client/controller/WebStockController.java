@@ -1,6 +1,7 @@
 package py.com.pg.webstock.gwt.client.controller;
 
 import py.com.pg.webstock.gwt.client.ClienteABM;
+import py.com.pg.webstock.gwt.client.ProductoABM;
 import py.com.pg.webstock.gwt.client.ProveedorABM;
 import py.com.pg.webstock.gwt.client.WestPanel;
 
@@ -55,7 +56,7 @@ public class WebStockController {
 		simple.add(con, new MarginData(10));
 		RootPanel.get().clear();
 		RootPanel.get().add(con);
-		proveedoresClicked();
+		productosClicked();
 	}
 
 	public void personasClicked() {
@@ -66,5 +67,11 @@ public class WebStockController {
 	public void proveedoresClicked() {
 		getCenterPanel().clear();
 		getCenterPanel().add(new ProveedorABM());
+	}
+
+	public void productosClicked() {
+		getCenterPanel().clear();
+		getCenterPanel().add(new ProductoABM());
+
 	}
 }

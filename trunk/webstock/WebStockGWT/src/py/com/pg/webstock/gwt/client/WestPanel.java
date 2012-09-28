@@ -50,6 +50,16 @@ public class WestPanel extends ContentPanel {
 		tbProveedor.setIcon(Recursos.Util.getInstance().iconBanco());
 		con.add(tbProveedor, new VerticalLayoutData(1, -1));
 
+		TextButton tbProducto = new TextButton("Productos");
+		tbProducto.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				controller.productosClicked();
+			}
+		});
+		tbProducto.setIcon(Recursos.Util.getInstance().iconListItems());
+		con.add(tbProducto, new VerticalLayoutData(1, -1));
+
 		add(con);
 	}
 }
