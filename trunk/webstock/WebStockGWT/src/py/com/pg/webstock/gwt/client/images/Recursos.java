@@ -29,6 +29,9 @@ public interface Recursos extends ClientBundle {
 	@Source("new.png")
 	ImageResource iconEdit();
 
+	@Source("bag.png")
+	ImageResource bag();
+
 	@ImageOptions(repeatStyle = RepeatStyle.None)
 	ImageResource editorButtonLeft();
 
@@ -38,9 +41,7 @@ public interface Recursos extends ClientBundle {
 	@ImageOptions(repeatStyle = RepeatStyle.None)
 	ImageResource editorButtonRight();
 
-	@ImageOptions(repeatStyle = RepeatStyle.Horizontal)
-	ImageResource editorButtonBackground();
-
+	public static final Recursos IMAGES = GWT.create(Recursos.class);
 
 	public static class Util {
 		private static Recursos INSTANCE;

@@ -6,9 +6,12 @@ import java.util.List;
 import py.com.pg.webstock.entities.Producto;
 import py.com.pg.webstock.entities.Proveedor;
 import py.com.pg.webstock.gwt.client.access.ProductoPA;
+import py.com.pg.webstock.gwt.client.access.ProveedorPA;
 import py.com.pg.webstock.gwt.client.images.Recursos;
 import py.com.pg.webstock.gwt.client.service.ProductoService;
 import py.com.pg.webstock.gwt.client.service.ProductoServiceAsync;
+import py.com.pg.webstock.gwt.client.service.ProveedorService;
+import py.com.pg.webstock.gwt.client.service.ProveedorServiceAsync;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.core.client.GWT;
@@ -18,6 +21,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.ButtonCell.IconAlign;
+import com.sencha.gxt.cell.core.client.form.ComboBoxCell.TriggerAction;
 import com.sencha.gxt.cell.core.client.form.SpinnerFieldCell;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.button.TextButton;
@@ -28,7 +32,9 @@ import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent.CompleteEditHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.form.ComboBox;
 import com.sencha.gxt.widget.core.client.form.NumberField;
+import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor.DoublePropertyEditor;
 import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor.LongPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -52,12 +58,15 @@ public class ProductoABM implements IsWidget {
 	 * 
 	 */
 	public static final ProductoPA pa = GWT.create(ProductoPA.class);
+	public static final ProveedorPA paProveedor = GWT.create(ProveedorPA.class);
 
 	// Aca le decimso al GWT qeu cree el servicio, y el hace la magia!
 	// Atender qeu nos retorna un ASYNC pero le pasamos el no Asincronos
 	ProductoServiceAsync productoService = GWT.create(ProductoService.class);
+	ProveedorServiceAsync proveedorService = GWT.create(ProveedorService.class);
 
 	ListStore<Producto> store;
+	ListStore<Proveedor> storeProveedores;
 
 	Grid<Producto> g;
 
@@ -72,6 +81,7 @@ public class ProductoABM implements IsWidget {
 		VerticalLayoutContainer con = new VerticalLayoutContainer();
 		// Aca se almacenan todos los valores que seran mostrados en el grid
 		store = new ListStore<Producto>(pa.key());
+		storeProveedores = new ListStore<Proveedor>(paProveedor.key());
 		// este es el modlo de las columnas, usamos el por defecto par ano armar
 		// bardo
 		ColumnModel<Producto> cm = new ColumnModel<Producto>(getColumnConfig());
@@ -102,6 +112,17 @@ public class ProductoABM implements IsWidget {
 			@Override
 			public void onSuccess(List<Producto> result) {
 				store.addAll(result);
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Info.display("Productos", "no se pudo cargar productos");
+			}
+		});
+		proveedorService.getEntidades(new AsyncCallback<List<Proveedor>>() {
+			@Override
+			public void onSuccess(List<Proveedor> result) {
+				storeProveedores.addAll(result);
 			}
 
 			@Override
@@ -184,21 +205,32 @@ public class ProductoABM implements IsWidget {
 				sfc.getPropertyEditor());
 
 		nfCantidad.setEmptyText("Ingrese la cantidad");
-		
+
 		editing.addEditor(cantidad, nfCantidad);
-		//
-		// TextField tfRuc = new TextField();
-		// tfRuc.setEmptyText("Ingrese el RUC");
-		// editing.addEditor(ruc, tfRuc);
-		//
-		// TextField tfTelefono = new TextField();
-		// tfTelefono.setEmptyText("Ingrese el Telefono");
-		// editing.addEditor(telefono, tfTelefono);
-		//
-		// DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
-		// dateField.setClearValueOnParseError(false);
-		// editing.addEditor(fecha, dateField);
-		//
+
+		SpinnerFieldCell<Double> sfcPrecioCompra = new SpinnerFieldCell<Double>(
+				new DoublePropertyEditor());
+
+		NumberField<Double> nfPrecioCompra = new NumberField<Double>(
+				sfcPrecioCompra, sfcPrecioCompra.getPropertyEditor());
+
+		editing.addEditor(precioCompra, nfPrecioCompra);
+
+		SpinnerFieldCell<Double> sfcPrecioVenta = new SpinnerFieldCell<Double>(
+				new DoublePropertyEditor());
+
+		NumberField<Double> nfPrecioVenta = new NumberField<Double>(
+				sfcPrecioVenta, sfcPrecioVenta.getPropertyEditor());
+
+		editing.addEditor(precioVenta, nfPrecioVenta);
+
+		ComboBox<Proveedor> comboProveedor = new ComboBox<Proveedor>(
+				storeProveedores, paProveedor.nameLabel());
+		comboProveedor.setTriggerAction(TriggerAction.ALL);
+		comboProveedor.setEditable(false);
+
+		editing.addEditor(proveedor, comboProveedor);
+
 		editing.addCompleteEditHandler(new CompleteEditHandler<Producto>() {
 
 			@Override
