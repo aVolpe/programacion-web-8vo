@@ -30,7 +30,7 @@
         <url-pattern>/webstockgwt/ProveedorService</url-pattern>
     </servlet-mapping>
 
-        <servlet>
+    <servlet>
         <servlet-name>ProductoService</servlet-name>
         <servlet-class>py.com.pg.webstock.gwt.server.service.ProductoServiceImpl</servlet-class>
     </servlet>
@@ -38,5 +38,15 @@
     <servlet-mapping>
         <servlet-name>ProductoService</servlet-name>
         <url-pattern>/webstockgwt/ProductoService</url-pattern>
+    </servlet-mapping>
+    
+	<servlet>
+        <servlet-name>CompraService</servlet-name>
+        <servlet-class>py.com.pg.webstock.gwt.server.service.CompraServiceImpl</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>CompraService</servlet-name>
+        <url-pattern>/webstockgwt/CompraService</url-pattern>
     </servlet-mapping>
 </web-app>
