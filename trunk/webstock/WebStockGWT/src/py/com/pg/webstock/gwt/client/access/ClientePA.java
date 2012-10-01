@@ -18,6 +18,7 @@ public interface ClientePA extends PropertyAccess<Cliente> {
 	 * @return
 	 */
 	@Path("id")
+	//esta clase hace eso!.. dado un cliente el retorna un ID unico!
 	ModelKeyProvider<Cliente> key();
 
 	/**
