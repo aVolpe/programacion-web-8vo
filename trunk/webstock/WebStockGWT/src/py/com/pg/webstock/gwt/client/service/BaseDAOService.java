@@ -23,4 +23,8 @@ public interface BaseDAOService<T extends BaseEntity> extends RemoteService {
 	public Long getCount();
 
 	public List<T> getByExample(T example);
+
+	// dale comentamos por el momentom!
+	
+//	BaseEntity set(int id);
 }
