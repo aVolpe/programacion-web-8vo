@@ -12,6 +12,7 @@ import com.sencha.gxt.cell.core.client.ButtonCell.IconAlign;
 import com.sencha.gxt.core.client.dom.XElement;
 import com.sencha.gxt.widget.core.client.button.ButtonGroup;
 import com.sencha.gxt.widget.core.client.button.TextButton;
+import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer.VerticalLayoutData;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 
@@ -69,6 +70,30 @@ public class NorthPanel extends ButtonGroup {
 			}
 		});
 		table.setWidget(0, 3, tbCompra);
+
+		TextButton tbPago = new TextButton("Pagos");
+		tbPago.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				controller.pagosClicked();
+			}
+		});
+		tbPago.setIcon(Resources.IMAGES.add16());
+		// esto es asi, como ahora es una grilla, le dice, en la fila 0, columna
+		// 4 poneme este boton
+		table.setWidget(0, 4, tbPago);
+
+		TextButton tbSPago = new TextButton("Subir Pagos");
+		tbSPago.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				controller.spagosClicked();
+			}
+		});
+		tbSPago.setIcon(Resources.IMAGES.add16());
+		table.setWidget(0, 5, tbSPago);
+		// esto no tengo idea de que hace, pero si no poenes sale re feo, (es
+		// luego feo)
 		cleanCells(table.getElement());
 	}
 
