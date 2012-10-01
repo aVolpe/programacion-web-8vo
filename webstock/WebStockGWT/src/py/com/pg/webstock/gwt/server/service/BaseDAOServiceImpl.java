@@ -9,6 +9,10 @@ import java.util.List;
 import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Root;
 import javax.transaction.UserTransaction;
 
 import org.hibernate.Session;
@@ -39,10 +43,31 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 		return em.find(getClase(), id);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * <code>Session</code> es de hibernate, si no podes poner como platform
+	 * hibernate usa <code>EntityManager</code>
+	 */
 	@Override
 	public List<T> getEntidades() {
-		return filter(session.createCriteria(getClase()).list());
+		// Obtiene el criteriaBuilder, es un coso para hacer select sin escribir
+		// select, es mas complicado, pero podes hacer generico
+		CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+		// le decimos que haga un select de nuestra clase! (esto quiere decir
+		// que retornara una lista del tipo T (nuestraclase)) o select
+		// NUESTRACLASE
+		CriteriaQuery<T> criteriaQuery = criteriaBuilder
+				.createQuery(getClase());
+		// le dice que la raiz va a ser de nuestra calse (from NUESTRACLASE)
+		Root<T> from = criteriaQuery.from(getClase());
+		// aca creamos el select en si
+		CriteriaQuery<T> select = criteriaQuery.select(from);
+		// aca hacemos el query que va a la BD, no hace falta habia sido
+		TypedQuery<T> typedQuery = em.createQuery(select);
+		return typedQuery.getResultList();
+		// espera que busco como se hacia
+		// Y TODo ESO ES LAS SIGUIENTE LINEA CON HIBERNATE, por eso la gente le
+		// quiere a hibernate, continua nomas ah cierto tenia que crea cliente 
+		// return filter(session.createCriteria(getClase()).list());
 	}
 
 	@Override
