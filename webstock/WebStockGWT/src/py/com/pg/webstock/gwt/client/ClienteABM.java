@@ -187,11 +187,12 @@ public class ClienteABM implements IsWidget {
 
 		NumberField<Double> nfSaldo = new NumberField<Double>(sfc,
 				sfc.getPropertyEditor());
-		tfTelefono.setEmptyText("Ingrese el Telefono");
+		nfSaldo.setEmptyText("Ingrese el Saldo");
 		editing.addEditor(saldo, nfSaldo);
 
 		DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
 		dateField.setClearValueOnParseError(false);
+		dateField.setEmptyText("Hola mi amor como estas?");
 		editing.addEditor(fecha, dateField);
 
 		editing.addCompleteEditHandler(new CompleteEditHandler<Cliente>() {
@@ -287,6 +288,7 @@ public class ClienteABM implements IsWidget {
 
 		@Override
 		public void onFailure(Throwable caught) {
+			caught.printStackTrace();
 			Info.display("Clientes", "Imposible guardar, reintente");
 		}
 	}
