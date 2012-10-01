@@ -65,11 +65,11 @@ public class Pago extends BaseEntity implements Serializable {
 		this.monto = monto;
 	}
 
-	public Date getfecha() {
+	public Date getFecha() {
 		return fecha;
 	}
 
-	public void setfecha(Date fecha) {
+	public void setFecha(Date fecha) {
 		this.fecha = fecha;
 	}
 
