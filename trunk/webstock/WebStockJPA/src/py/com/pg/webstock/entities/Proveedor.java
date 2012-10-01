@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
 /**
@@ -20,7 +19,7 @@ public class Proveedor extends BaseEntity implements Serializable {
 	private String ruc;
 	private Date fechaAlta;
 
-	@OneToMany(mappedBy = "proveedor", fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "proveedor")
 	private List<Producto> productos;
 
 	private static final long serialVersionUID = 1L;

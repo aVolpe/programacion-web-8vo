@@ -66,4 +66,9 @@ public class Producto extends BaseEntity implements Serializable {
 		this.precioVenta = precioVenta;
 	}
 
+	@Override
+	public String toString() {
+		return nombre + getId();
+	}
+
 }
