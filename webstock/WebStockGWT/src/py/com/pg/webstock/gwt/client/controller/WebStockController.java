@@ -3,12 +3,15 @@ package py.com.pg.webstock.gwt.client.controller;
 import py.com.pg.webstock.gwt.client.ClienteABM;
 import py.com.pg.webstock.gwt.client.CompraABM;
 import py.com.pg.webstock.gwt.client.NorthPanel;
+import py.com.pg.webstock.gwt.client.PagoABM;
 import py.com.pg.webstock.gwt.client.ProductoABM;
 import py.com.pg.webstock.gwt.client.ProveedorABM;
+import py.com.pg.webstock.gwt.client.SubirArchivo;
 
 import com.gargoylesoftware.htmlunit.javascript.host.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.sencha.gxt.core.client.util.Margins;
+import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer;
 import com.sencha.gxt.widget.core.client.container.BorderLayoutContainer.BorderLayoutData;
 import com.sencha.gxt.widget.core.client.container.MarginData;
@@ -56,7 +59,7 @@ public class WebStockController {
 		simple.add(con, new MarginData(10));
 		RootPanel.get().clear();
 		RootPanel.get().add(con);
-		comprasClicked();
+		productosClicked();
 	}
 
 	public void personasClicked() {
@@ -79,5 +82,19 @@ public class WebStockController {
 		getCenterPanel().clear();
 		getCenterPanel().add(new CompraABM());
 
+	}
+
+	public void pagosClicked() {
+		getCenterPanel().clear();
+		getCenterPanel().add(new PagoABM());
+
+	}
+
+	public void spagosClicked() {
+		Dialog d = new Dialog();
+		d.add(new SubirArchivo());
+		// una vez estube 45 minutos pensando por que no pasaba nada y era por
+		// esto jaja
+		d.show();
 	}
 }
