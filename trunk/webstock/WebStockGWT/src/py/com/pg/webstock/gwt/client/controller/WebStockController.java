@@ -59,7 +59,7 @@ public class WebStockController {
 		simple.add(con, new MarginData(10));
 		RootPanel.get().clear();
 		RootPanel.get().add(con);
-		productosClicked();
+		comprasClicked();
 	}
 
 	public void personasClicked() {

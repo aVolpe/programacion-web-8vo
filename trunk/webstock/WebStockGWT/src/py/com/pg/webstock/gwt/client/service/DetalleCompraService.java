@@ -14,10 +14,14 @@
  *******************************************************************************/
 package py.com.pg.webstock.gwt.client.service;
 
+import java.util.List;
+
+import py.com.pg.webstock.entities.Compra;
 import py.com.pg.webstock.entities.DetalleCompra;
 
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("DetalleCompraService")
 public interface DetalleCompraService extends BaseDAOService<DetalleCompra> {
+	public List<DetalleCompra> getByCompra(Compra compra);
 }
