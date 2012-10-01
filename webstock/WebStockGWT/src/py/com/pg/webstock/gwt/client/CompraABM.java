@@ -7,28 +7,44 @@ import java.util.List;
 import py.com.pg.webstock.entities.Compra;
 import py.com.pg.webstock.entities.Proveedor;
 import py.com.pg.webstock.gwt.client.access.CompraPA;
+import py.com.pg.webstock.gwt.client.access.ProveedorPA;
 import py.com.pg.webstock.gwt.client.images.Recursos;
 import py.com.pg.webstock.gwt.client.service.CompraService;
 import py.com.pg.webstock.gwt.client.service.CompraServiceAsync;
+import py.com.pg.webstock.gwt.client.service.ProveedorService;
+import py.com.pg.webstock.gwt.client.service.ProveedorServiceAsync;
 
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.ButtonCell.IconAlign;
+import com.sencha.gxt.cell.core.client.NumberCell;
 import com.sencha.gxt.data.shared.ListStore;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
 import com.sencha.gxt.widget.core.client.container.HBoxLayoutContainer.HBoxLayoutAlign;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
+import com.sencha.gxt.widget.core.client.event.CompleteEditEvent.CompleteEditHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
+import com.sencha.gxt.widget.core.client.form.DateField;
+import com.sencha.gxt.widget.core.client.form.DateTimePropertyEditor;
+import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
+import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
 import com.sencha.gxt.widget.core.client.grid.ColumnModel;
 import com.sencha.gxt.widget.core.client.grid.Grid;
 import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
+import com.sencha.gxt.widget.core.client.grid.editing.ClicksToEdit;
 import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
 import com.sencha.gxt.widget.core.client.info.Info;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
@@ -46,12 +62,15 @@ public class CompraABM implements IsWidget {
 	 * 
 	 */
 	public static final CompraPA pa = GWT.create(CompraPA.class);
+	public static final ProveedorPA paProveedor = GWT.create(ProveedorPA.class);
 
 	// Aca le decimso al GWT qeu cree el servicio, y el hace la magia!
 	// Atender qeu nos retorna un ASYNC pero le pasamos el no Asincronos
-	CompraServiceAsync CompraService = GWT.create(CompraService.class);
+	CompraServiceAsync compraService = GWT.create(CompraService.class);
+	ProveedorServiceAsync proveedorService = GWT.create(ProveedorService.class);
 
 	ListStore<Compra> store;
+	ListStore<Proveedor> proveedores;
 
 	Grid<Compra> g;
 
@@ -95,7 +114,7 @@ public class CompraABM implements IsWidget {
 	}
 
 	private void cargarStores() {
-		CompraService.getEntidades(new AsyncCallback<List<Compra>>() {
+		compraService.getEntidades(new AsyncCallback<List<Compra>>() {
 			@Override
 			public void onSuccess(List<Compra> result) {
 				store.addAll(result);
@@ -108,12 +127,25 @@ public class CompraABM implements IsWidget {
 			}
 		});
 
+		proveedores = new ListStore<Proveedor>(paProveedor.key());
+		proveedorService.getEntidades(new AsyncCallback<List<Proveedor>>() {
+			@Override
+			public void onSuccess(List<Proveedor> result) {
+				proveedores.addAll(result);
+
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Info.display("Compras", "no se pudo cargar proveedores");
+			}
+		});
+
 	}
 
 	ColumnConfig<Compra, Proveedor> proveedor;
-	ColumnConfig<Compra, String> ruc;
-	ColumnConfig<Compra, String> telefono;
-	ColumnConfig<Compra, Double> saldo;
+	ColumnConfig<Compra, Double> total;
+	ColumnConfig<Compra, String> factura;
 	ColumnConfig<Compra, Date> fecha;
 
 	/**
@@ -134,24 +166,36 @@ public class CompraABM implements IsWidget {
 	 * @return
 	 */
 	public List<ColumnConfig<Compra, ?>> getColumnConfig() {
-		proveedor = new ColumnConfig<Compra, Proveedor>(pa.proveedor(), 200, "Nombre");
-		
-//		nombre = new ColumnConfig<Compra, String>(pa.nombre(), 150, "Nombre");
-//		ruc = new ColumnConfig<Compra, String>(pa.ruc(), 150, "RUC");
-//		telefono = new ColumnConfig<Compra, String>(pa.telefono(), 150,
-//				"Telefono");
-//		saldo = new ColumnConfig<Compra, Double>(pa.saldo(), 150, "Saldo");
-//		fecha = new ColumnConfig<Compra, Date>(pa.fechaAlta(), 250,
-//				"Fecha de alta");
-//
-//		fecha.setCell(new DateCell(fmt));
+		proveedor = new ColumnConfig<Compra, Proveedor>(pa.proveedor(), 200,
+				"Proveedor");
+		proveedor.setCell(new AbstractCell<Proveedor>() {
+			@Override
+			public void render(com.google.gwt.cell.client.Cell.Context context,
+					Proveedor value, SafeHtmlBuilder sb) {
+				if (value == null)
+					return;
+				else
+					sb.appendEscaped(value.getNombre());
+			}
+		});
 
+		fecha = new ColumnConfig<Compra, Date>(pa.fecha(), 250,
+				"Fecha de compra");
+
+		fecha.setCell(new DateCell(fmt));
+
+		factura = new ColumnConfig<Compra, String>(pa.nroFactura(), 250,
+				"Factura Numero");
+		factura.setAlignment(HasHorizontalAlignment.ALIGN_RIGHT);
+		total = new ColumnConfig<Compra, Double>(pa.total(), 250,
+				"Total factura:");
+		NumberFormat nf = NumberFormat.getFormat("000000.00 'Gs.'");
+		total.setCell(new NumberCell<Double>(nf));
 		List<ColumnConfig<Compra, ?>> aRet = new ArrayList<ColumnConfig<Compra, ?>>();
-//		aRet.add(nombre);
-//		aRet.add(ruc);
-//		aRet.add(telefono);
-//		aRet.add(saldo);
-//		aRet.add(fecha);
+		aRet.add(proveedor);
+		aRet.add(fecha);
+		aRet.add(factura);
+		aRet.add(total);
 		return aRet;
 
 	}
@@ -161,48 +205,29 @@ public class CompraABM implements IsWidget {
 	 * interesante de esta clase del orte
 	 */
 	public void configEditing() {
-//		editing = new GridRowEditing<Compra>(g);
-//
-//		TextField tfNombre = new TextField();
-//		tfNombre.setEmptyText("Ingrese el nombre");
-//		editing.addEditor(nombre, tfNombre);
-//
-//		TextField tfRuc = new TextField();
-//		tfRuc.setEmptyText("Ingrese el RUC");
-//		editing.addEditor(ruc, tfRuc);
-//
-//		TextField tfTelefono = new TextField();
-//		tfTelefono.setEmptyText("Ingrese el Telefono");
-//		editing.addEditor(telefono, tfTelefono);
-//
-//		SpinnerFieldCell<Double> sfc = new SpinnerFieldCell<Double>(
-//				new DoublePropertyEditor());
-//
-//		NumberField<Double> nfSaldo = new NumberField<Double>(sfc,
-//				sfc.getPropertyEditor());
-//		tfTelefono.setEmptyText("Ingrese el Telefono");
-//		editing.addEditor(saldo, nfSaldo);
-//
-//		DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
-//		dateField.setClearValueOnParseError(false);
-//		editing.addEditor(fecha, dateField);
-//
-//		editing.addCompleteEditHandler(new CompleteEditHandler<Compra>() {
-//
-//			@Override
-//			public void onCompleteEdit(CompleteEditEvent<Compra> event) {
-//				// guarda todos lso cambios en el store, asi podemos obtener el
-//				// cilnete cambiado
-//				store.commitChanges();
-//				/**
-//				 * esta linea me tomo 3 meses construir, lo que hace es: <Br>
-//				 * 1. Obtiene la fila que se esta editando <br>
-//				 * 2. La busca en el store, el store se actualiza
-//				 * automaticamente y su orden es el orden donde se muestra
-//				 */
-//				editadoCompleto(store.get(event.getEditCell().getRow()));
-//			}
-//		});
+		editing = new GridRowEditing<Compra>(g);
+
+		editing.setClicksToEdit(ClicksToEdit.TWO);
+
+		DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
+		dateField.setClearValueOnParseError(false);
+		editing.addEditor(fecha, dateField);
+
+		TextField nroFactura = new TextField();
+		nroFactura.setEmptyText("Ingrese el numero de factura");
+		nroFactura.setAllowBlank(false);
+
+		SimpleComboBox<Proveedor> scb = new SimpleComboBox<Proveedor>(
+				paProveedor.nameLabel());
+		scb.setStore(proveedores);
+		editing.addEditor(proveedor, scb);
+		editing.addCompleteEditHandler(new CompleteEditHandler<Compra>() {
+			@Override
+			public void onCompleteEdit(CompleteEditEvent<Compra> event) {
+				store.commitChanges();
+				editadoCompleto(store.get(event.getEditCell().getRow()));
+			}
+		});
 	}
 
 	public void crearToolBar() {
@@ -244,13 +269,13 @@ public class CompraABM implements IsWidget {
 	public void editadoCompleto(final Compra c) {
 		// nuevo
 		if (c.getId() == 0)
-			CompraService.add(c, new GuardarCallBack(c));
+			compraService.add(c, new GuardarCallBack(c));
 		else
-			CompraService.update(c, new GuardarCallBack(c));
+			compraService.update(c, new GuardarCallBack(c));
 	}
 
 	public void eliminar(final Compra entidad) {
-		CompraService.remove(entidad, new AsyncCallback<Compra>() {
+		compraService.remove(entidad, new AsyncCallback<Compra>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				Info.display("Compras", "Eliminacion fallada, reintente");
