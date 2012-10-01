@@ -9,6 +9,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public interface BaseDAOServiceAsync<T extends BaseEntity> {
 
 	void get(int id, AsyncCallback<T> callback);
+	
+//	void set(int id, AsyncCallback<T> callback);
 
 	void getEntidades(AsyncCallback<List<T>> callback);
 
