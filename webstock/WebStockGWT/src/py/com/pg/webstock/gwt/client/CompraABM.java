@@ -5,12 +5,20 @@ import java.util.Date;
 import java.util.List;
 
 import py.com.pg.webstock.entities.Compra;
+import py.com.pg.webstock.entities.DetalleCompra;
+import py.com.pg.webstock.entities.Producto;
 import py.com.pg.webstock.entities.Proveedor;
 import py.com.pg.webstock.gwt.client.access.CompraPA;
+import py.com.pg.webstock.gwt.client.access.DetalleCompraPA;
+import py.com.pg.webstock.gwt.client.access.ProductoPA;
 import py.com.pg.webstock.gwt.client.access.ProveedorPA;
 import py.com.pg.webstock.gwt.client.images.Recursos;
 import py.com.pg.webstock.gwt.client.service.CompraService;
 import py.com.pg.webstock.gwt.client.service.CompraServiceAsync;
+import py.com.pg.webstock.gwt.client.service.DetalleCompraService;
+import py.com.pg.webstock.gwt.client.service.DetalleCompraServiceAsync;
+import py.com.pg.webstock.gwt.client.service.ProductoService;
+import py.com.pg.webstock.gwt.client.service.ProductoServiceAsync;
 import py.com.pg.webstock.gwt.client.service.ProveedorService;
 import py.com.pg.webstock.gwt.client.service.ProveedorServiceAsync;
 
@@ -18,6 +26,8 @@ import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Document;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -27,17 +37,27 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.ButtonCell.IconAlign;
 import com.sencha.gxt.cell.core.client.NumberCell;
+import com.sencha.gxt.cell.core.client.form.SpinnerFieldCell;
 import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.widget.core.client.ContentPanel;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
 import com.sencha.gxt.widget.core.client.container.HBoxLayoutContainer.HBoxLayoutAlign;
 import com.sencha.gxt.widget.core.client.container.VerticalLayoutContainer;
+import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent;
+import com.sencha.gxt.widget.core.client.event.BeforeStartEditEvent.BeforeStartEditHandler;
+import com.sencha.gxt.widget.core.client.event.CellClickEvent;
+import com.sencha.gxt.widget.core.client.event.CellClickEvent.CellClickHandler;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent;
 import com.sencha.gxt.widget.core.client.event.CompleteEditEvent.CompleteEditHandler;
 import com.sencha.gxt.widget.core.client.event.SelectEvent;
 import com.sencha.gxt.widget.core.client.event.SelectEvent.SelectHandler;
 import com.sencha.gxt.widget.core.client.form.DateField;
 import com.sencha.gxt.widget.core.client.form.DateTimePropertyEditor;
+import com.sencha.gxt.widget.core.client.form.Field;
+import com.sencha.gxt.widget.core.client.form.NumberField;
+import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor.DoublePropertyEditor;
+import com.sencha.gxt.widget.core.client.form.NumberPropertyEditor.LongPropertyEditor;
 import com.sencha.gxt.widget.core.client.form.SimpleComboBox;
 import com.sencha.gxt.widget.core.client.form.TextField;
 import com.sencha.gxt.widget.core.client.grid.ColumnConfig;
@@ -63,21 +83,34 @@ public class CompraABM implements IsWidget {
 	 */
 	public static final CompraPA pa = GWT.create(CompraPA.class);
 	public static final ProveedorPA paProveedor = GWT.create(ProveedorPA.class);
+	public static final DetalleCompraPA paDetalle = GWT
+			.create(DetalleCompraPA.class);
+	public static final ProductoPA paProducto = GWT.create(ProductoPA.class);
 
 	// Aca le decimso al GWT qeu cree el servicio, y el hace la magia!
 	// Atender qeu nos retorna un ASYNC pero le pasamos el no Asincronos
 	CompraServiceAsync compraService = GWT.create(CompraService.class);
 	ProveedorServiceAsync proveedorService = GWT.create(ProveedorService.class);
+	DetalleCompraServiceAsync detalleService = GWT
+			.create(DetalleCompraService.class);
+	ProductoServiceAsync productoService = GWT.create(ProductoService.class);
 
+	ListStore<DetalleCompra> detalles;
 	ListStore<Compra> store;
 	ListStore<Proveedor> proveedores;
+	ListStore<Producto> productos;
 
 	Grid<Compra> g;
+	Grid<DetalleCompra> gridDetalles;
 
 	ToolBar bb;
+	ToolBar bbDetalles;
 
 	GridRowEditing<Compra> editing;
+	GridRowEditing<DetalleCompra> editingDetalle;
 
+	DetalleCompra antiguoDetalle;
+	private ContentPanel panelDetalle;
 	private static final DateTimeFormat fmt = DateTimeFormat
 			.getFormat("EEEE, dd 'de' MMMM 'del' yyyy");
 
@@ -88,28 +121,56 @@ public class CompraABM implements IsWidget {
 		VerticalLayoutContainer con = new VerticalLayoutContainer();
 		// Aca se almacenan todos los valores que seran mostrados en el grid
 		store = new ListStore<Compra>(pa.key());
+		detalles = new ListStore<DetalleCompra>(paDetalle.key());
 		// este es el modlo de las columnas, usamos el por defecto par ano armar
 		// bardo
 		ColumnModel<Compra> cm = new ColumnModel<Compra>(getColumnConfig());
+		ColumnModel<DetalleCompra> cmd = new ColumnModel<DetalleCompra>(
+				getDetalleColumnConfig());
 		// Grilla en si, le pasamos el store donde estan los componentes y la
 		// configuracion de las columnas
 		g = new Grid<Compra>(store, cm);
+		gridDetalles = new Grid<DetalleCompra>(detalles, cmd);
 		//
 
 		// esto le dice que la columna NOMBRE se exapndira cuando hya mucho
 		// espacio
 		g.getView().setAutoExpandColumn(proveedor);
+		gridDetalles.getView().setAutoExpandColumn(producto);
 
+		g.addCellClickHandler(new CellClickHandler() {
+			@Override
+			public void onCellClick(CellClickEvent event) {
+				cargarDetalle(store.get(event.getRowIndex()));
+			}
+		});
 		cargarStores();
 		configEditing();
 		crearToolBar();
 
-		// TODO ver como hacer dinamico
-		g.setHeight(800);
+		g.setHeight(200);
+		gridDetalles.setHeight(200);
 		// agregamos el toolbar y el grid a la vista, lo agregara arriba
 		Document.get().setTitle("Compras - WebStock");
-		con.add(bb);
-		con.add(g);
+		ContentPanel panelCompra = new ContentPanel();
+		panelCompra.setHeadingHtml("Compra");
+		VerticalLayoutContainer compraVLC = new VerticalLayoutContainer();
+		compraVLC.setBorders(true);
+		compraVLC.add(bb);
+		compraVLC.add(g);
+		panelCompra.setWidget(compraVLC);
+		con.add(panelCompra);
+
+		panelDetalle = new ContentPanel();
+		panelDetalle.setHeadingText("Detalle de la compra");
+		VerticalLayoutContainer containerDetalle = new VerticalLayoutContainer();
+		containerDetalle.setBorders(true);
+		containerDetalle.add(bbDetalles);
+		containerDetalle.add(gridDetalles);
+
+		panelDetalle.setWidget(containerDetalle);
+		panelDetalle.setEnabled(false);
+		con.add(panelDetalle);
 		return con;
 	}
 
@@ -138,6 +199,20 @@ public class CompraABM implements IsWidget {
 			@Override
 			public void onFailure(Throwable caught) {
 				Info.display("Compras", "no se pudo cargar proveedores");
+			}
+		});
+
+		productos = new ListStore<Producto>(paProducto.key());
+		productoService.getEntidades(new AsyncCallback<List<Producto>>() {
+
+			@Override
+			public void onSuccess(List<Producto> result) {
+				productos.addAll(result);
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Info.display("Compras", "no se pudo cargar productos");
 			}
 		});
 
@@ -200,6 +275,35 @@ public class CompraABM implements IsWidget {
 
 	}
 
+	ColumnConfig<DetalleCompra, Producto> producto;
+	ColumnConfig<DetalleCompra, Long> cantidad;
+	ColumnConfig<DetalleCompra, Double> precio;
+
+	public List<ColumnConfig<DetalleCompra, ?>> getDetalleColumnConfig() {
+		producto = new ColumnConfig<DetalleCompra, Producto>(
+				paDetalle.producto(), 600, "Producto");
+		producto.setCell(new AbstractCell<Producto>() {
+			@Override
+			public void render(com.google.gwt.cell.client.Cell.Context context,
+					Producto value, SafeHtmlBuilder sb) {
+				if (value == null)
+					return;
+				sb.appendEscaped(value.getNombre());
+			}
+		});
+		cantidad = new ColumnConfig<DetalleCompra, Long>(paDetalle.cantidad(),
+				400, "Cantidad");
+		precio = new ColumnConfig<DetalleCompra, Double>(paDetalle.precio(),
+				400, "Precio");
+
+		List<ColumnConfig<DetalleCompra, ?>> aRet = new ArrayList<ColumnConfig<DetalleCompra, ?>>(
+				3);
+		aRet.add(producto);
+		aRet.add(cantidad);
+		aRet.add(precio);
+		return aRet;
+	}
+
 	/**
 	 * Ahora hacemos a las celdas editables esto es re magico y lo mas
 	 * interesante de esta clase del orte
@@ -228,6 +332,69 @@ public class CompraABM implements IsWidget {
 				editadoCompleto(store.get(event.getEditCell().getRow()));
 			}
 		});
+
+		editingDetalle = new GridRowEditing<DetalleCompra>(gridDetalles);
+
+		SimpleComboBox<Producto> scbProducto = new SimpleComboBox<Producto>(
+				paProducto.nameLabel());
+		scbProducto.setStore(productos);
+		scbProducto.setEmptyText("Ingrese el producto");
+		editingDetalle.addEditor(producto, scbProducto);
+
+		SpinnerFieldCell<Long> sfcCantidad = new SpinnerFieldCell<Long>(
+				new LongPropertyEditor());
+		NumberField<Long> nfCantidad = new NumberField<Long>(sfcCantidad,
+				sfcCantidad.getPropertyEditor());
+		nfCantidad.setEmptyText("Ingrese la cantidad");
+		editingDetalle.addEditor(cantidad, nfCantidad);
+
+		SpinnerFieldCell<Double> sfc = new SpinnerFieldCell<Double>(
+				new DoublePropertyEditor());
+
+		NumberField<Double> nfPrecio = new NumberField<Double>(sfc,
+				sfc.getPropertyEditor());
+		nfPrecio.setEditable(false);
+		nfPrecio.setEmptyText("Seleccione un producto");
+		editingDetalle.addEditor(precio, nfPrecio);
+
+		editingDetalle
+				.addBeforeStartEditHandler(new BeforeStartEditHandler<DetalleCompra>() {
+					@Override
+					public void onBeforeStartEdit(
+							BeforeStartEditEvent<DetalleCompra> event) {
+						if (((DetalleCompra) detalles.get(event.getEditCell()
+								.getRow())).getId() == 0) {
+							antiguoDetalle = null;
+						} else {
+							antiguoDetalle = (DetalleCompra) detalles.get(event
+									.getEditCell().getRow());
+						}
+						Field<Producto> f = editingDetalle.getEditor(producto);
+						Field<Double> fPrecio = editingDetalle
+								.getEditor(precio);
+						final NumberField<Double> nfPrecio = (NumberField<Double>) fPrecio;
+						final SimpleComboBox<Producto> scb = (SimpleComboBox<Producto>) f;
+						scb.addSelectionHandler(new SelectionHandler<Producto>() {
+							@Override
+							public void onSelection(
+									SelectionEvent<Producto> event) {
+								nfPrecio.setValue(event.getSelectedItem()
+										.getPrecioCompra());
+							}
+						});
+					}
+				});
+
+		editingDetalle
+				.addCompleteEditHandler(new CompleteEditHandler<DetalleCompra>() {
+					@Override
+					public void onCompleteEdit(
+							CompleteEditEvent<DetalleCompra> event) {
+						detalles.commitChanges();
+						editacoDetalleCompleto(detalles.get(event.getEditCell()
+								.getRow()));
+					}
+				});
 	}
 
 	public void crearToolBar() {
@@ -236,7 +403,6 @@ public class CompraABM implements IsWidget {
 		bb = new ToolBar();
 		bb.setHBoxLayoutAlign(HBoxLayoutAlign.MIDDLE);
 		bb.setPack(BoxLayoutPack.CENTER);
-		// TODO cambiar
 		TextButton tbAdd = new TextButton("Agregar");
 		tbAdd.addSelectHandler(new SelectHandler() {
 			@Override
@@ -264,14 +430,52 @@ public class CompraABM implements IsWidget {
 		bb.add(tbAdd);
 		bb.add(tbRemove);
 
+		bbDetalles = new ToolBar();
+		bbDetalles.setHBoxLayoutAlign(HBoxLayoutAlign.MIDDLE);
+		bbDetalles.setPack(BoxLayoutPack.CENTER);
+		TextButton tbAddDetalle = new TextButton("Agregar detalle");
+		tbAddDetalle.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				DetalleCompra nuevo = new DetalleCompra();
+				nuevo.setCompra(g.getSelectionModel().getSelectedItem());
+				detalles.add(nuevo);
+				int index = detalles.indexOf(nuevo);
+				editingDetalle.startEditing(new GridCell(index, 0));
+			}
+		});
+		tbAddDetalle.setIcon(Recursos.Util.getInstance().iconAdd());
+		tbAddDetalle.setIconAlign(IconAlign.RIGHT);
+
+		TextButton tbRemoveDetalle = new TextButton("Borrar detalle");
+		tbRemoveDetalle.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				if (gridDetalles.getSelectionModel().getSelectedItem() == null)
+					return;
+				else
+					eliminarDetalle(gridDetalles.getSelectionModel()
+							.getSelectedItem());
+			}
+
+		});
+		tbRemoveDetalle.setIcon(Recursos.Util.getInstance().iconDelete());
+		bbDetalles.add(tbAddDetalle);
+		bbDetalles.add(tbRemoveDetalle);
 	}
 
 	public void editadoCompleto(final Compra c) {
-		// nuevo
 		if (c.getId() == 0)
 			compraService.add(c, new GuardarCallBack(c));
 		else
 			compraService.update(c, new GuardarCallBack(c));
+	}
+
+	public void editacoDetalleCompleto(DetalleCompra dc) {
+		if (dc.getId() == 0)
+			detalleService.add(dc, new GuardarDetalleCallBack(dc));
+		else
+			detalleService.update(dc, new GuardarDetalleCallBack(dc));
 	}
 
 	public void eliminar(final Compra entidad) {
@@ -288,6 +492,74 @@ public class CompraABM implements IsWidget {
 				editing.cancelEditing();
 			}
 		});
+	}
+
+	private void eliminarDetalle(DetalleCompra selectedItem) {
+		detalleService.remove(selectedItem, new AsyncCallback<DetalleCompra>() {
+
+			@Override
+			public void onSuccess(DetalleCompra result) {
+				Info.display("Compra", "Eliminado correctamente");
+				if (result.getCompra() != null) {
+					Compra c = store.findModel(result.getCompra());
+					c.setTotal(c.getTotal()
+							- (result.getCantidad() * result.getPrecio()));
+				}
+				detalles.remove(result);
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Info.display("Compra", "Imposible borrar detalle");
+			}
+		});
+	}
+
+	public void cargarDetalle(Compra c) {
+		panelDetalle.setEnabled(true);
+		detalleService.getByCompra(c, new AsyncCallback<List<DetalleCompra>>() {
+			@Override
+			public void onSuccess(List<DetalleCompra> result) {
+				detalles.clear();
+				detalles.addAll(result);
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				Info.display("Compras", "NO se pudo cargar detalles");
+			}
+		});
+	}
+
+	public class GuardarDetalleCallBack implements AsyncCallback<DetalleCompra> {
+		DetalleCompra dc;
+
+		public GuardarDetalleCallBack(DetalleCompra dc) {
+			this.dc = dc;
+		}
+
+		@Override
+		public void onFailure(Throwable caught) {
+			Info.display("ERROR", "Imposible guardar detalle");
+		}
+
+		@Override
+		public void onSuccess(DetalleCompra result) {
+			Info.display("EE", dc.toString());
+			dc.setId(result.getId());
+			// este cambio es solo grafico, el verdadero cambio se hace en el
+			// servicio
+			Double modifTotal = 0D;
+			if (antiguoDetalle != null) {
+				modifTotal -= antiguoDetalle.getCantidad()
+						* antiguoDetalle.getPrecio();
+			}
+			modifTotal += dc.getPrecio() * dc.getCantidad();
+			Compra c = store.findModel(dc.getCompra());
+			c.setTotal(c.getTotal() + modifTotal);
+			// ahora se guarda el cambio que se acaba de hacer
+//			editadoCompleto(c);
+		}
 	}
 
 	public static class GuardarCallBack implements AsyncCallback<Compra> {

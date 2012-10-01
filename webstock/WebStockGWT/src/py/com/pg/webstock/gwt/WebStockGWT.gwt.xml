@@ -1,26 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<module rename-to='webstockgwt'>
-	<!-- Inherit the core Web Toolkit stuff. -->
-	<inherits name='com.google.gwt.user.User' />
+<module rename-to="webstockgwt" >
 
-	<!-- Inherit the default GWT style sheet. You can change -->
-	<!-- the theme of your GWT application by uncommenting -->
-	<!-- any one of the following lines. -->
-	<inherits name='com.google.gwt.user.theme.clean.Clean' />
-	<inherits name='py.com.pg.webstock.entities' />
-	<inherits name='com.sencha.gxt.ui.GXT' />
-	<!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
-	<!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
-	<!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/> -->
+    <!-- Inherit the core Web Toolkit stuff. -->
 
-	<!-- Other module inherits -->
+    <inherits name="com.google.gwt.user.User" />
 
-	<!-- Specify the app entry point class. -->
-	<entry-point class='py.com.pg.webstock.gwt.client.WebStockGWT' />
+    <!-- Inherit the default GWT style sheet. You can change -->
+    <!-- the theme of your GWT application by uncommenting -->
+    <!-- any one of the following lines. -->
 
-	<!-- Specify the paths for translatable code -->
-	<source path='client' />
-	<source path='shared' />
-	<set-property name="user.agent" value="safari" />
+    <inherits name="com.google.gwt.user.theme.clean.Clean" />
+
+    <inherits name="py.com.pg.webstock.entities" />
+
+    <inherits name="com.sencha.gxt.ui.GXT" />
+    <!-- <inherits name='com.google.gwt.user.theme.standard.Standard'/> -->
+    <!-- <inherits name='com.google.gwt.user.theme.chrome.Chrome'/> -->
+    <!-- <inherits name='com.google.gwt.user.theme.dark.Dark'/> -->
+
+    <inherits name="gwtupload.GWTUpload" />
+    <!-- Other module inherits -->
+
+
+    <!-- Specify the app entry point class. -->
+
+    <entry-point class="py.com.pg.webstock.gwt.client.WebStockGWT" />
+
+    <!-- Specify the paths for translatable code -->
+
+    <source path="client" />
+
+    <source path="shared" />
+
+    <set-property
+        name="user.agent"
+        value="safari" />
 
 </module>

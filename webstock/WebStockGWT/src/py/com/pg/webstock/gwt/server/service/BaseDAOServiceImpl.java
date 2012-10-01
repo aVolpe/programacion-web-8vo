@@ -63,10 +63,10 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 		CriteriaQuery<T> select = criteriaQuery.select(from);
 		// aca hacemos el query que va a la BD, no hace falta habia sido
 		TypedQuery<T> typedQuery = em.createQuery(select);
-		return typedQuery.getResultList();
+		return filter(typedQuery.getResultList());
 		// espera que busco como se hacia
 		// Y TODo ESO ES LAS SIGUIENTE LINEA CON HIBERNATE, por eso la gente le
-		// quiere a hibernate, continua nomas ah cierto tenia que crea cliente 
+		// quiere a hibernate, continua nomas ah cierto tenia que crea cliente
 		// return filter(session.createCriteria(getClase()).list());
 	}
 
@@ -115,8 +115,9 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 		try {
 			ut.begin();
 			em.merge(entidad);
-			System.out.println("Modificada entidad con id " + entidad.getId());
 			ut.commit();
+			System.out.println("Modificando " + getClase().getSimpleName()
+					+ " con id " + entidad.getId());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}

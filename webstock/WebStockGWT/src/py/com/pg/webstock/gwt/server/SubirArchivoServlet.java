@@ -15,20 +15,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.UserTransaction;
 
 import org.apache.commons.fileupload.FileItem;
-import org.hibernate.Session;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.sencha.gxt.widget.core.client.info.Info;
 
 import py.com.pg.webstock.entities.Cliente;
 import py.com.pg.webstock.entities.Pago;
-import py.com.pg.webstock.gwt.client.ClienteABM.GuardarCallBack;
-import py.com.pg.webstock.gwt.client.service.ClienteService;
-import py.com.pg.webstock.gwt.client.service.ClienteServiceAsync;
-import py.com.pg.webstock.gwt.client.service.PagoService;
-import py.com.pg.webstock.gwt.client.service.PagoServiceAsync;
 
 public class SubirArchivoServlet extends UploadAction {
 	
