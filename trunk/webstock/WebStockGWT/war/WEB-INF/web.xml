@@ -72,4 +72,14 @@
 		<servlet-name>subirArchivoServlet</servlet-name>
 		<url-pattern>*.fileUpload</url-pattern>
 	</servlet-mapping>
+	
+   	<servlet>
+        <servlet-name>DetalleCompraService</servlet-name>
+        <servlet-class>py.com.pg.webstock.gwt.server.service.DetalleCompraServiceImpl</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DetalleCompraService</servlet-name>
+        <url-pattern>/webstockgwt/DetalleCompraService</url-pattern>
+    </servlet-mapping>
 </web-app>
