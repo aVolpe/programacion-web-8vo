@@ -144,10 +144,10 @@ public class ClienteABM implements IsWidget {
 	 */
 	public List<ColumnConfig<Cliente, ?>> getColumnConfig() {
 		nombre = new ColumnConfig<Cliente, String>(pa.nombre(), 150, "Nombre");
-		ruc = new ColumnConfig<Cliente, String>(pa.ruc(), 150, "RUC");
+		ruc = new ColumnConfig<Cliente, String>(pa.ruc(), 200, "RUC");
 		telefono = new ColumnConfig<Cliente, String>(pa.telefono(), 150,
 				"Telefono");
-		saldo = new ColumnConfig<Cliente, Double>(pa.saldo(), 150, "Saldo");
+		saldo = new ColumnConfig<Cliente, Double>(pa.saldo(), 200, "Saldo");
 		fecha = new ColumnConfig<Cliente, Date>(pa.fechaAlta(), 250,
 				"Fecha de alta");
 

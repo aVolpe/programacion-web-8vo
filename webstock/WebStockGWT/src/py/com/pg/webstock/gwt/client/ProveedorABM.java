@@ -138,11 +138,11 @@ public class ProveedorABM implements IsWidget {
 	 * @return
 	 */
 	public List<ColumnConfig<Proveedor, ?>> getColumnConfig() {
-		nombre = new ColumnConfig<Proveedor, String>(pa.nombre(), 150, "Nombre");
-		ruc = new ColumnConfig<Proveedor, String>(pa.ruc(), 150, "RUC");
-		telefono = new ColumnConfig<Proveedor, String>(pa.telefono(), 150,
+		nombre = new ColumnConfig<Proveedor, String>(pa.nombre(), 400, "Nombre");
+		ruc = new ColumnConfig<Proveedor, String>(pa.ruc(), 250, "RUC");
+		telefono = new ColumnConfig<Proveedor, String>(pa.telefono(), 250,
 				"Telefono");
-		fecha = new ColumnConfig<Proveedor, Date>(pa.fechaAlta(), 250,
+		fecha = new ColumnConfig<Proveedor, Date>(pa.fechaAlta(), 400,
 				"Fecha de alta");
 
 		fecha.setCell(new DateCell(fmt));
