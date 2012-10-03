@@ -201,19 +201,19 @@ public class ProductoABM implements IsWidget {
 		SpinnerFieldCell<Long> sfc = new SpinnerFieldCell<Long>(
 				new LongPropertyEditor());
 
-		NumberField<Long> nfCantidad = new NumberField<Long>(sfc,
-				sfc.getPropertyEditor());
-
-		nfCantidad.setEmptyText("Ingrese la cantidad");
-
-		editing.addEditor(cantidad, nfCantidad);
+//		NumberField<Long> nfCantidad = new NumberField<Long>(sfc,
+//				sfc.getPropertyEditor());
+//
+//		nfCantidad.setEmptyText("Ingrese la cantidad");
+//
+//		editing.addEditor(cantidad, nfCantidad);
 
 		SpinnerFieldCell<Double> sfcPrecioCompra = new SpinnerFieldCell<Double>(
 				new DoublePropertyEditor());
 
 		NumberField<Double> nfPrecioCompra = new NumberField<Double>(
 				sfcPrecioCompra, sfcPrecioCompra.getPropertyEditor());
-
+		nfPrecioCompra.setEmptyText("Ingrese precio de compra");
 		editing.addEditor(precioCompra, nfPrecioCompra);
 
 		SpinnerFieldCell<Double> sfcPrecioVenta = new SpinnerFieldCell<Double>(
@@ -221,14 +221,15 @@ public class ProductoABM implements IsWidget {
 
 		NumberField<Double> nfPrecioVenta = new NumberField<Double>(
 				sfcPrecioVenta, sfcPrecioVenta.getPropertyEditor());
-
+		nfPrecioVenta.setEmptyText("Ingrese precio de venta");
 		editing.addEditor(precioVenta, nfPrecioVenta);
 
 		ComboBox<Proveedor> comboProveedor = new ComboBox<Proveedor>(
 				storeProveedores, paProveedor.nameLabel());
 		comboProveedor.setTriggerAction(TriggerAction.ALL);
 		comboProveedor.setEditable(false);
-
+		
+		comboProveedor.setEmptyText("Seleccione un proveedor");
 		editing.addEditor(proveedor, comboProveedor);
 
 		editing.addCompleteEditHandler(new CompleteEditHandler<Producto>() {
@@ -255,6 +256,7 @@ public class ProductoABM implements IsWidget {
 			@Override
 			public void onSelect(SelectEvent event) {
 				Producto nuevo = new Producto();
+				nuevo.setCantidad((long)0);
 				store.add(nuevo);
 				int index = store.indexOf(nuevo);
 				editing.startEditing(new GridCell(index, 0));

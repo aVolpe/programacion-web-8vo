@@ -313,7 +313,9 @@ public class CompraABM implements IsWidget {
 
 		SimpleComboBox<Proveedor> scb = new SimpleComboBox<Proveedor>(
 				paProveedor.nameLabel());
+
 		scb.setStore(proveedores);
+		scb.setEmptyText("Seleccione proveedor");
 		editing.addEditor(proveedor, scb);
 		editing.addCompleteEditHandler(new CompleteEditHandler<Compra>() {
 			@Override

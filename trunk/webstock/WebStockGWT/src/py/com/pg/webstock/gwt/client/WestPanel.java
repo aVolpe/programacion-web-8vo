@@ -98,7 +98,7 @@ public class WestPanel extends ContentPanel {
 		// 4 poneme este boton
 		// table.setWidget(0, fila++, tbPago);
 
-		TextButton tbSPago = new TextButton("Subir Pagos");
+		/*TextButton tbSPago = new TextButton("Subir Pagos");
 		tbSPago.addSelectHandler(new SelectHandler() {
 			@Override
 			public void onSelect(SelectEvent event) {
@@ -106,7 +106,7 @@ public class WestPanel extends ContentPanel {
 			}
 		});
 		tbSPago.setIcon(Resources.IMAGES.add16());
-		vlc.add(tbSPago, new VerticalLayoutData(1, -1));
+		vlc.add(tbSPago, new VerticalLayoutData(1, -1));*/
 		// table.setWidget(0, fila++, tbSPago);
 		// esto no tengo idea de que hace, pero si no poenes sale re feo, (es
 		// luego feo)

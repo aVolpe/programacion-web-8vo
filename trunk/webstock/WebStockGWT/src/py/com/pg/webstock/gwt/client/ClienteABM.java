@@ -192,7 +192,7 @@ public class ClienteABM implements IsWidget {
 
 		DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
 		dateField.setClearValueOnParseError(false);
-		dateField.setEmptyText("Hola mi amor como estas?");
+		dateField.setEmptyText("Seleccione la fecha");
 		editing.addEditor(fecha, dateField);
 
 		editing.addCompleteEditHandler(new CompleteEditHandler<Cliente>() {
