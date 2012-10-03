@@ -96,11 +96,9 @@ public class WebStockController {
 
 	}
 
-	public void spagosClicked() {
+	/*public void spagosClicked() {
 		Dialog d = new Dialog();
 		d.add(new SubirArchivo());
-		// una vez estube 45 minutos pensando por que no pasaba nada y era por
-		// esto jaja
 		d.show();
-	}
+	}*/
 }
