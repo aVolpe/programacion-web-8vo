@@ -15,10 +15,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.transaction.UserTransaction;
 
-import org.hibernate.Session;
-import org.hibernate.criterion.Example;
-import org.hibernate.criterion.Projections;
-
 import py.com.pg.webstock.entities.BaseEntity;
 import py.com.pg.webstock.gwt.client.service.BaseDAOService;
 
@@ -32,8 +28,8 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 	@PersistenceContext(unitName = "WebStockJPA")
 	EntityManager em;
 
-	@PersistenceContext(unitName = "WebStockJPA")
-	Session session;
+	// @PersistenceContext(unitName = "WebStockJPA")
+	// Session session;
 
 	@Resource
 	UserTransaction ut;
@@ -74,9 +70,10 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 	public T add(T entidad) {
 		try {
 			ut.begin();
-			em.persist(entidad);
-			System.out.println("Creada entidad con id " + entidad.getId());
+			em.merge(entidad);
 			ut.commit();
+			System.out.println("Creada entidad con id " + entidad.getId() + "-"
+					+ getClase().getSimpleName());
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -126,8 +123,9 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 
 	@Override
 	public Long getCount() {
-		return (Long) session.createCriteria(getClase())
-				.setProjection(Projections.rowCount()).uniqueResult();
+		// return (Long) session.createCriteria(getClase())
+		// .setProjection(Projections.rowCount()).uniqueResult();
+		return 0L;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -138,10 +136,10 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 		return (Class<T>) type.getActualTypeArguments()[0];
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<T> getByExample(T example) {
-		return filter(session.createCriteria(getClase())
-				.add(Example.create(example)).list());
+		// return filter(session.createCriteria(getClase())
+		// .add(Example.create(example)).list());
+		return null;
 	}
 
 	/**
@@ -191,25 +189,27 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 			return null;
 		try {
 			Class<?> clase = (Class<?>) objeto.getClass();
-			Object nuevo = clase.newInstance();
 			for (Field f : clase.getDeclaredFields()) {
 				// si es estatico omito
 				if (Modifier.isStatic(f.getModifiers()))
 					continue;
-				// si es una lista omito
-				if (f.getType() == List.class)
-					continue;
-				// si es otra entidad omito
-				if (BaseEntity.class.isAssignableFrom(f.getType()))
-					continue;
-				f.setAccessible(true);
-				Object o = f.get(objeto);
-				f.set(nuevo, o);
+				// si es una lista cero
+				if (f.getType() == List.class) {
+					f.setAccessible(true);
+					f.set(objeto, getEmptyList());
+				}
+				if (BaseEntity.class.isAssignableFrom(f.getType())) {
+					f.setAccessible(true);
+					f.set(objeto, null);
+				}
 			}
-			return nuevo;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return objeto;
+	}
+
+	public List getEmptyList() {
+		return new ArrayList();
 	}
 }

@@ -67,6 +67,7 @@ import com.sencha.gxt.widget.core.client.grid.Grid.GridCell;
 import com.sencha.gxt.widget.core.client.grid.editing.ClicksToEdit;
 import com.sencha.gxt.widget.core.client.grid.editing.GridRowEditing;
 import com.sencha.gxt.widget.core.client.info.Info;
+import com.sencha.gxt.widget.core.client.toolbar.SeparatorToolItem;
 import com.sencha.gxt.widget.core.client.toolbar.ToolBar;
 
 /**
@@ -99,6 +100,7 @@ public class CompraABM implements IsWidget {
 	ListStore<Compra> store;
 	ListStore<Proveedor> proveedores;
 	ListStore<Producto> productos;
+	ArrayList<DetalleCompra> eliminados;
 
 	Grid<Compra> g;
 	Grid<DetalleCompra> gridDetalles;
@@ -203,19 +205,6 @@ public class CompraABM implements IsWidget {
 		});
 
 		productos = new ListStore<Producto>(paProducto.key());
-		productoService.getEntidades(new AsyncCallback<List<Producto>>() {
-
-			@Override
-			public void onSuccess(List<Producto> result) {
-				productos.addAll(result);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Info.display("Compras", "no se pudo cargar productos");
-			}
-		});
-
 	}
 
 	ColumnConfig<Compra, Proveedor> proveedor;
@@ -320,6 +309,7 @@ public class CompraABM implements IsWidget {
 		TextField nroFactura = new TextField();
 		nroFactura.setEmptyText("Ingrese el numero de factura");
 		nroFactura.setAllowBlank(false);
+		editing.addEditor(factura, nroFactura);
 
 		SimpleComboBox<Proveedor> scb = new SimpleComboBox<Proveedor>(
 				paProveedor.nameLabel());
@@ -391,8 +381,8 @@ public class CompraABM implements IsWidget {
 					public void onCompleteEdit(
 							CompleteEditEvent<DetalleCompra> event) {
 						detalles.commitChanges();
-						editacoDetalleCompleto(detalles.get(event.getEditCell()
-								.getRow()));
+						actualizarTotal(detalles.get(
+								event.getEditCell().getRow()).getCompra());
 					}
 				});
 	}
@@ -408,6 +398,7 @@ public class CompraABM implements IsWidget {
 			@Override
 			public void onSelect(SelectEvent event) {
 				Compra nuevo = new Compra();
+				nuevo.setTotal(0D);
 				store.add(nuevo);
 				int index = store.indexOf(nuevo);
 				editing.startEditing(new GridCell(index, 0));
@@ -460,8 +451,19 @@ public class CompraABM implements IsWidget {
 
 		});
 		tbRemoveDetalle.setIcon(Recursos.Util.getInstance().iconDelete());
+
+		TextButton tbGuardar = new TextButton("Guardar Cambios");
+		tbGuardar.setIcon(Recursos.IMAGES.iconOpen());
+		tbGuardar.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				guardarDetalleClick();
+			}
+		});
 		bbDetalles.add(tbAddDetalle);
 		bbDetalles.add(tbRemoveDetalle);
+		bbDetalles.add(new SeparatorToolItem());
+		bbDetalles.add(tbGuardar);
 	}
 
 	public void editadoCompleto(final Compra c) {
@@ -471,11 +473,22 @@ public class CompraABM implements IsWidget {
 			compraService.update(c, new GuardarCallBack(c));
 	}
 
-	public void editacoDetalleCompleto(DetalleCompra dc) {
-		if (dc.getId() == 0)
-			detalleService.add(dc, new GuardarDetalleCallBack(dc));
-		else
-			detalleService.update(dc, new GuardarDetalleCallBack(dc));
+	public void guardarDetalleClick() {
+		editingDetalle.cancelEditing();
+
+		Compra c = g.getSelectionModel().getSelectedItem();
+		actualizarTotal(c);
+		editadoCompleto(c);
+		for (DetalleCompra dc : detalles.getAll()) {
+			if (dc.getId() == 0)
+				detalleService.add(dc, new GuardarDetalleCallBack(dc));
+			else
+				detalleService.update(dc, new GuardarDetalleCallBack(dc));
+		}
+		for (DetalleCompra dc : eliminados) {
+			detalleService.remove(dc, new GuardarDetalleCallBack(dc));
+		}
+		eliminados = new ArrayList<DetalleCompra>();
 	}
 
 	public void eliminar(final Compra entidad) {
@@ -494,25 +507,21 @@ public class CompraABM implements IsWidget {
 		});
 	}
 
+	private void actualizarTotal(Compra c) {
+		Compra compra = store.findModel(c);
+		Double total = 0D;
+		for (DetalleCompra detalle : detalles.getAll()) {
+			total += detalle.getCantidad() * detalle.getPrecio();
+		}
+		compra.setTotal(total);
+		store.update(compra);
+	}
+
 	private void eliminarDetalle(DetalleCompra selectedItem) {
-		detalleService.remove(selectedItem, new AsyncCallback<DetalleCompra>() {
-
-			@Override
-			public void onSuccess(DetalleCompra result) {
-				Info.display("Compra", "Eliminado correctamente");
-				if (result.getCompra() != null) {
-					Compra c = store.findModel(result.getCompra());
-					c.setTotal(c.getTotal()
-							- (result.getCantidad() * result.getPrecio()));
-				}
-				detalles.remove(result);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				Info.display("Compra", "Imposible borrar detalle");
-			}
-		});
+		detalles.remove(selectedItem);
+		actualizarTotal(selectedItem.getCompra());
+		if (selectedItem.getId() != 0)
+			eliminados.add(selectedItem);
 	}
 
 	public void cargarDetalle(Compra c) {
@@ -529,6 +538,25 @@ public class CompraABM implements IsWidget {
 				Info.display("Compras", "NO se pudo cargar detalles");
 			}
 		});
+
+		productoService.getProductosByProveedor(c.getProveedor(),
+				new AsyncCallback<List<Producto>>() {
+
+					@Override
+					public void onSuccess(List<Producto> result) {
+						if (result.size() == 0)
+							Info.display("Compras", "Proveedor sin productos");
+						productos.clear();
+						productos.addAll(result);
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						Info.display("Compras", "no se pudo cargar productos");
+					}
+				});
+
+		eliminados = new ArrayList<DetalleCompra>();
 	}
 
 	public class GuardarDetalleCallBack implements AsyncCallback<DetalleCompra> {
@@ -545,20 +573,7 @@ public class CompraABM implements IsWidget {
 
 		@Override
 		public void onSuccess(DetalleCompra result) {
-			Info.display("EE", dc.toString());
 			dc.setId(result.getId());
-			// este cambio es solo grafico, el verdadero cambio se hace en el
-			// servicio
-			Double modifTotal = 0D;
-			if (antiguoDetalle != null) {
-				modifTotal -= antiguoDetalle.getCantidad()
-						* antiguoDetalle.getPrecio();
-			}
-			modifTotal += dc.getPrecio() * dc.getCantidad();
-			Compra c = store.findModel(dc.getCompra());
-			c.setTotal(c.getTotal() + modifTotal);
-			// ahora se guarda el cambio que se acaba de hacer
-//			editadoCompleto(c);
 		}
 	}
 
