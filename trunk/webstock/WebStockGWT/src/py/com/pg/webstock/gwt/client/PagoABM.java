@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.sencha.gxt.cell.core.client.ButtonCell.IconAlign;
 import com.sencha.gxt.cell.core.client.form.SpinnerFieldCell;
 import com.sencha.gxt.data.shared.ListStore;
+import com.sencha.gxt.widget.core.client.Dialog;
 import com.sencha.gxt.widget.core.client.button.TextButton;
 import com.sencha.gxt.widget.core.client.container.BoxLayoutContainer.BoxLayoutPack;
 import com.sencha.gxt.widget.core.client.container.HBoxLayoutContainer.HBoxLayoutAlign;
@@ -321,8 +322,28 @@ public class PagoABM implements IsWidget {
 			}
 		});
 		tbRemove.setIcon(Recursos.Util.getInstance().iconDelete());
+		
+		TextButton tbSubir = new TextButton("Subir Pagos");
+		tbSubir.addSelectHandler(new SelectHandler() {
+			@Override
+			public void onSelect(SelectEvent event) {
+				Dialog d = new Dialog();
+				d.setHeadingText("Subir Archivo - Pagos");
+				d.setHideOnButtonClick(true);
+				d.add(new SubirArchivo());
+				d.show();
+			}
+		});
+		tbSubir.setIcon(Recursos.Util.getInstance().iconAdd());
+		tbSubir.setIconAlign(IconAlign.RIGHT);
+		
+		
+		
+		
+		
 		bb.add(tbAdd);
 		bb.add(tbRemove);
+		bb.add(tbSubir);
 
 	}
 
