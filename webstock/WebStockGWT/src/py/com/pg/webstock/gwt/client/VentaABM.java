@@ -315,7 +315,7 @@ public class VentaABM implements IsWidget {
 		SimpleComboBox<Producto> scbProducto = new SimpleComboBox<Producto>(
 				paProducto.nameLabel());
 		scbProducto.setStore(productos);
-		scbProducto.setEmptyText("Ingrese el producto");
+		scbProducto.setEmptyText("Seleccione el producto");
 		editingDetalle.addEditor(producto, scbProducto);
 
 		SpinnerFieldCell<Long> sfcCantidad = new SpinnerFieldCell<Long>(
@@ -331,7 +331,7 @@ public class VentaABM implements IsWidget {
 		NumberField<Double> nfPrecio = new NumberField<Double>(sfc,
 				sfc.getPropertyEditor());
 		nfPrecio.setEditable(false);
-		nfPrecio.setEmptyText("Seleccione un producto");
+		nfPrecio.setEmptyText("Ingrese precio");
 		editingDetalle.addEditor(precio, nfPrecio);
 
 		editingDetalle

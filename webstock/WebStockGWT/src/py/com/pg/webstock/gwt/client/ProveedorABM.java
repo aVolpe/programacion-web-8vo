@@ -177,6 +177,7 @@ public class ProveedorABM implements IsWidget {
 
 		DateField dateField = new DateField(new DateTimePropertyEditor(fmt));
 		dateField.setClearValueOnParseError(false);
+		dateField.setEmptyText("Seleccione la fecha");
 		editing.addEditor(fecha, dateField);
 
 		editing.addCompleteEditHandler(new CompleteEditHandler<Proveedor>() {
