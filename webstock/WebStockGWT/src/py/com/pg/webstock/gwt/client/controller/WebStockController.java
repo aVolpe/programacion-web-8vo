@@ -2,11 +2,12 @@ package py.com.pg.webstock.gwt.client.controller;
 
 import py.com.pg.webstock.gwt.client.ClienteABM;
 import py.com.pg.webstock.gwt.client.CompraABM;
-import py.com.pg.webstock.gwt.client.NorthPanel;
+import py.com.pg.webstock.gwt.client.WestPanel;
 import py.com.pg.webstock.gwt.client.PagoABM;
 import py.com.pg.webstock.gwt.client.ProductoABM;
 import py.com.pg.webstock.gwt.client.ProveedorABM;
 import py.com.pg.webstock.gwt.client.SubirArchivo;
+import py.com.pg.webstock.gwt.client.VentaABM;
 
 import com.gargoylesoftware.htmlunit.javascript.host.Window;
 import com.google.gwt.user.client.ui.RootPanel;
@@ -42,7 +43,7 @@ public class WebStockController {
 		final BorderLayoutContainer con = new BorderLayoutContainer();
 		con.setBorders(false);
 
-		NorthPanel west = new NorthPanel();
+		WestPanel west = new WestPanel();
 
 		BorderLayoutData westData = new BorderLayoutData(150);
 		westData.setCollapsible(true);
@@ -51,7 +52,7 @@ public class WebStockController {
 		westData.setMargins(new Margins(0, 5, 0, 5));
 
 		// con.setNorthWidget(north, northData);
-		con.setNorthWidget(west, westData);
+		con.setWestWidget(west, westData);
 		con.setCenterWidget(getCenterPanel(), new MarginData());
 		con.setHeight((int) (Window.WINDOW_HEIGHT * 0.97f));
 		con.setWidth((int) (Window.WINDOW_WIDTH * 0.97));
@@ -59,7 +60,7 @@ public class WebStockController {
 		simple.add(con, new MarginData(10));
 		RootPanel.get().clear();
 		RootPanel.get().add(con);
-		comprasClicked();
+		ventasClicked();
 	}
 
 	public void personasClicked() {
@@ -82,6 +83,11 @@ public class WebStockController {
 		getCenterPanel().clear();
 		getCenterPanel().add(new CompraABM());
 
+	}
+
+	public void ventasClicked() {
+		getCenterPanel().clear();
+		getCenterPanel().add(new VentaABM());
 	}
 
 	public void pagosClicked() {

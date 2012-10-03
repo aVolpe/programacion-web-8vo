@@ -22,7 +22,6 @@ public class DetalleCompraServiceImpl extends BaseDAOServiceImpl<DetalleCompra>
 			ut.begin();
 			em.merge(entidad);
 			Producto p = em.find(Producto.class, entidad.getProducto().getId());
-			System.out.println("AAAAAAAAAAA" + entidad.getCantidad());
 			p.setCantidad(p.getCantidad() + entidad.getCantidad());
 			em.merge(p);
 			ut.commit();

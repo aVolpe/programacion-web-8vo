@@ -71,6 +71,7 @@ public abstract class BaseDAOServiceImpl<T extends BaseEntity> extends
 		try {
 			ut.begin();
 			em.merge(entidad);
+			em.flush();
 			ut.commit();
 			System.out.println("Creada entidad con id " + entidad.getId() + "-"
 					+ getClase().getSimpleName());

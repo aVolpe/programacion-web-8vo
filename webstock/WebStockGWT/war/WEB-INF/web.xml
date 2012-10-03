@@ -82,4 +82,26 @@
         <servlet-name>DetalleCompraService</servlet-name>
         <url-pattern>/webstockgwt/DetalleCompraService</url-pattern>
     </servlet-mapping>
+    
+   
+
+    <servlet>
+		<servlet-name>VentaService</servlet-name>
+		<servlet-class>py.com.pg.webstock.gwt.server.service.VentaServiceImpl</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>VentaService</servlet-name>
+		<url-pattern>/webstockgwt/VentaService</url-pattern>
+	</servlet-mapping>
+	
+    <servlet>
+        <servlet-name>DetalleVentaService</servlet-name>
+        <servlet-class>py.com.pg.webstock.gwt.server.service.DetalleVentaServiceImpl</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DetalleVentaService</servlet-name>
+        <url-pattern>/webstockgwt/DetalleVentaService</url-pattern>
+    </servlet-mapping>
 </web-app>
