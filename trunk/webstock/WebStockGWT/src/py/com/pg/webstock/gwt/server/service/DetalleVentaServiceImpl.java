@@ -8,6 +8,7 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
+import py.com.pg.webstock.entities.Cliente;
 import py.com.pg.webstock.entities.DetalleVenta;
 import py.com.pg.webstock.entities.Producto;
 import py.com.pg.webstock.entities.Venta;
@@ -25,6 +26,11 @@ public class DetalleVentaServiceImpl extends BaseDAOServiceImpl<DetalleVenta>
 			System.out.println("AAAAAAAAAAA" + entidad.getCantidad());
 			p.setCantidad(p.getCantidad() - entidad.getCantidad());
 			em.merge(p);
+			
+			Cliente c = em.find(Cliente.class, entidad.getVenta().getCliente().getId());
+			c.setSaldo(c.getSaldo() - entidad.getCantidad()*entidad.getPrecio());
+			em.merge(c);
+			
 			ut.commit();
 		} catch (Exception e) {
 			e.printStackTrace();
