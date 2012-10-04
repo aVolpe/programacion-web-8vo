@@ -496,12 +496,18 @@ public class VentaABM implements IsWidget {
 
 	private void actualizarTotal(Venta c) {
 		Venta Venta = store.findModel(c);
+		
 		Double total = 0D;
 		for (DetalleVenta detalle : detalles.getAll()) {
 			total += detalle.getCantidad() * detalle.getPrecio();
 		}
 		Venta.setTotal(total);
 		store.update(Venta);
+		
+//		Cliente cliente = Venta.getCliente();
+//		Double saldoActual = cliente.getSaldo();
+//		cliente.setSaldo(saldoActual - total);
+//		Clientees.update(cliente);
 	}
 
 	private void eliminarDetalle(DetalleVenta selectedItem) {
