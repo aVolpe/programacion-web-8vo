@@ -99,7 +99,7 @@ public class SubirArchivoServlet extends UploadAction {
 
 		Cliente c = nuevo.getCliente();
 		nuevo = em.merge(nuevo);
-		if (nuevo.getEstado() != 1) {
+		if (nuevo.getEstado() != -1) {
 			Double saldoCliente = c.getSaldo();
 			saldoCliente = saldoCliente + nuevo.getMonto();
 			c.setSaldo(saldoCliente);
