@@ -64,4 +64,9 @@ public class Cliente extends BaseEntity implements Serializable {
 		this.saldo = saldo;
 	}
 
+	@Override
+	public String toString() {
+		return getId() + " - " + getNombre();
+	}
+
 }

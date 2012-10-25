@@ -1,57 +1,34 @@
 package py.com.pg.webstock.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
-import py.com.pg.webstock.entities.BaseEntity;
 import java.util.Date;
+
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.Check;
 
 /**
  * Entity implementation class for Entity: Upload
  * 
  */
 @Entity
+@Check(constraints = "monto >= 0")
 public class Pago extends BaseEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private int codPago;
 
-	@ManyToOne
+	@ManyToOne(optional = false)
 	private Cliente cliente;
 
 	private Double monto;
 	private Date fecha;
 
-	private String mensaje;
-	private int estado;
-
-	@PrePersist
-	public void antesDeGuardar() {
-		if (monto < 0) {
-			mensaje = "Error de monto";
-			estado = -1;
-			return;
-		}
-		mensaje = "OK";
-		estado = 1;
-
-	}
-
-	public String getMensaje() {
-		return mensaje;
-	}
-
-	public void setMensaje(String mensaje) {
-		this.mensaje = mensaje;
-	}
-
-	public int getEstado() {
-		return estado;
-	}
-
-	public void setEstado(int estado) {
-		this.estado = estado;
-	}
+	@OneToOne
+	private Transaccion transaccion;
 
 	public Pago() {
 		super();
@@ -65,11 +42,11 @@ public class Pago extends BaseEntity implements Serializable {
 		this.monto = monto;
 	}
 
-	public Date getFecha() {
+	public Date getfecha() {
 		return fecha;
 	}
 
-	public void setFecha(Date fecha) {
+	public void setfecha(Date fecha) {
 		this.fecha = fecha;
 	}
 
@@ -87,6 +64,14 @@ public class Pago extends BaseEntity implements Serializable {
 
 	public void setCodPago(int codPago) {
 		this.codPago = codPago;
+	}
+
+	public Transaccion getTransaccion() {
+		return transaccion;
+	}
+
+	public void setTransaccion(Transaccion transaccion) {
+		this.transaccion = transaccion;
 	}
 
 }
