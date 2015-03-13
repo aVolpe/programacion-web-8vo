@@ -1,2 +1,0 @@
-serviceClass: py.com.pg.webstock.gwt.client.service.ProveedorService
-path: 6E49AE208F17061080BF2D5849445D25.gwt.rpc
